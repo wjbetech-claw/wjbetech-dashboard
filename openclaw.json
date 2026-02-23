@@ -1,0 +1,8 @@
+{
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "groupPolicy": "allowlist",
+    }
+  }
+}
