@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --color-primary: #D9B84C; /* pale gold */
+  --color-accent: #C53030; /* red accent */
+}
+
+[data-theme='dark']{
+  --color-primary: #1E3A8A; /* dark blue */
+  --color-accent: #10B981; /* green */
+}
+
+body{ background-color: var(--bg); }
