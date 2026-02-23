@@ -1,0 +1,26 @@
+name: Model Policy Gate
+
+on:
+  pull_request:
+    types: [opened, edited, labeled]
+
+jobs:
+  codex-approval-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for codex label
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const labels = context.payload.pull_request.labels.map(l=>l.name)
+            if (labels.includes('model:codex-approve')) {
+              core.info('Codex approved')
+            } else {
+              const fs = require('fs')
+              const path = './escalation.md'
+              if (fs.existsSync(path)) {
+                core.setFailed('escalation.md present but PR not labeled with model:codex-approve')
+              } else {
+                core.setFailed('PR requires escalation.md and label to use codex')
+              }
+            }
