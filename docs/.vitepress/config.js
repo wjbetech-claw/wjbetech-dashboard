@@ -1,6 +1,6 @@
 export default {
-  title: 'WJBeTech Dashboard',
-  description: 'Docs for the WJBeTech Dashboard application',
+  title: 'wjbetech Dashboard',
+  description: 'Docs for the wjbetech Dashboard application',
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },

@@ -1,6 +1,6 @@
 # Developer Guide
 
-This guide covers code layout, conventions, local development workflows, tests, linting, and CI for the WJBeTech Dashboard.
+This guide covers code layout, conventions, local development workflows, tests, linting, and CI for the wjbetech Dashboard.
 
 Project layout
 

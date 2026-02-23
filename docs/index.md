@@ -1,6 +1,6 @@
-# WJBeTech Dashboard
+# wjbetech Dashboard
 
-WJBeTech Dashboard is a developer-focused GitHub dashboard that aggregates workflow information, CI/CD status, and a dedicated Jobs section on the front dashboard that scrapes developer and prompt-engineer job listings from public boards (LinkedIn, Indeed, etc.) and surfaces them inline. The dashboard will also highlight the currently active task or job you (or I) are working on across your codebases, so the active job is always visible.
+wjbetech Dashboard is a developer-focused GitHub dashboard that aggregates workflow information, CI/CD status, and a dedicated Jobs section on the front dashboard that scrapes developer and prompt-engineer job listings from public boards (LinkedIn, Indeed, etc.) and surfaces them inline. The dashboard will also highlight the currently active task or job you (or I) are working on across your codebases, so the active job is always visible.
 
 [![CI status](https://img.shields.io/github/actions/workflow/status/wjbetech-claw/wjbetech-dashboard/ci.yml?branch=main&label=ci&logo=github)](https://github.com/wjbetech-claw/wjbetech-dashboard/actions)
 [![License](https://img.shields.io/github/license/wjbetech-claw/wjbetech-dashboard)](LICENSE)

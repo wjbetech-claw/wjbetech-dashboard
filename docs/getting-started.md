@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide helps you set up and run the WJBeTech Dashboard locally and build it for production.
+This guide helps you set up and run the wjbetech Dashboard locally and build it for production.
 
 Prerequisites
 - Node 18 or later (recommended)
