@@ -1,0 +1,17 @@
+name: multi-agent-team
+description: Defines personas and mappings to skills for project collaboration.
+personas:
+  - name: project-manager
+    skills: [github-integration, web-development, security, multi-agent-orchestration]
+  - name: ux-designer
+    skills: [web-development, multi-agent-orchestration]
+  - name: developer
+    skills: [web-development, github-integration]
+  - name: marketer
+    skills: [multi-agent-orchestration]
+owners:
+  - wjbetech-claw
+runbook: |
+  - On project intake, create a brief and backlog using the multi-agent-orchestration skill.
+  - Assign tasks to personas and create issue templates in GitHub.
+  - Use security skill to vet any third-party dependencies or new skills before installing.
