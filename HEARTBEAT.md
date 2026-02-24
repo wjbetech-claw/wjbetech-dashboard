@@ -9,3 +9,4 @@ Location: /workspace/apps/wjbetech-dashboard (repo: https://github.com/wjbetech-
 
 Note: This file is read by the agent's heartbeat logic and used to ensure regular updates are posted to the channel when requested. If you want to pause updates, remove or edit this file.
 2026-02-24 13:23:30Z | wjbetech-dashboard | add package scripts | committed package.json updates | next: run lint/test or push PR
+2026-02-24 13:53:37Z | wjbetech-dashboard | add ui layout & routing | committed PageLayout, Navbar, Sidebar, routes and page shells | next: polish styles and wire primitives
