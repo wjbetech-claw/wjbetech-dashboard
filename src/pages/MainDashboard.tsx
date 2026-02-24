@@ -1,6 +1,4 @@
 import React from 'react'
-import Navbar from '../ui/navbar'
-
 const RepoCard = ({repo}:{repo:any}) => (
   <div className="card" style={{marginBottom:12}}>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
@@ -27,7 +25,6 @@ export default function MainDashboard(){
   ]
   return (
     <div>
-      <Navbar />
       <div style={{padding:20}}>
         <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:16}}>
           <section>
