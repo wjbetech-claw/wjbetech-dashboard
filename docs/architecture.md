@@ -7,6 +7,12 @@ Goals
 - Show an automatically-determined "active job" based on recent developer activity and assistant signals.
 - Keep integrations optional and the core app usable without external services (self-hosted Kanban is first-class).
 
+- Show recent commits across the user's projects (across wjbetech and wjbetech-claw accounts), with links to the commits and repositories.
+- Provide quick links to the user's projects and repos for fast navigation.
+- Display Vercel (and other host) deployment status for applications the user owns or monitors.
+- Aggregate any other development-status signals (open PRs, failing tests, pending reviews) to give a single-pane status view across organizations.
+
+
 Core Components
 
 1. Frontend (React + Vite)
