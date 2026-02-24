@@ -1,8 +1,5 @@
 import React from 'react'
+import Navbar from './ui/navbar'
 import Dashboard from './pages/Dashboard'
-
-export function App(){
-  return <Dashboard />
-}
-
-export default App
+import './styles/tokens.generated.css'
+export default function App(){return (<div><Navbar/><Dashboard/></div>)}

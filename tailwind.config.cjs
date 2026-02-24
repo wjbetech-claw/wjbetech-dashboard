@@ -1,13 +1,2 @@
-module.exports = {
-  content: ['./index.html','./src/**/*.{ts,tsx,js,jsx}'],
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        primary: 'var(--color-primary)',
-        accent: 'var(--color-accent)'
-      }
-    }
-  },
-  plugins: []
-}
+const tokens = require('./design/tailwind.tokens.js')
+module.exports = { content: ['./src/**/*.{js,ts,jsx,tsx}','./index.html'], theme: { extend: { colors: { primary: tokens.colors }, spacing: tokens.spacing, borderRadius: tokens.radius, fontFamily: { sans: [tokens.font.family] } } }, plugins: [] }
