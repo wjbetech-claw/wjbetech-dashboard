@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import './styles/ui-enhance.css'
+=======
+import './styles/tokens.generated.css'
+>>>>>>> Stashed changes
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
