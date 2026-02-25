@@ -1,8 +1,8 @@
 import React from 'react'
 
-export default function Card({ title, subtitle, children }: { title?: string; subtitle?: string; children?: React.ReactNode }){
+export default function Card({ title, subtitle, children, className }: { title?: string; subtitle?: string; children?: React.ReactNode; className?: string }){
   return (
-    <section style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:12,padding:16,boxShadow:'0 1px 0 rgba(0,0,0,0.04)'}}>
+    <section className={className} style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:14,padding:16,boxShadow:'0 10px 30px rgba(15,23,42,0.06)'}}>
       {title ? (
         <div style={{marginBottom:12}}>
           <div style={{fontWeight:700,fontSize:16}}>{title}</div>

@@ -4,19 +4,93 @@ import RecentActivity from '../components/RecentActivity'
 import PipelineOverview from '../components/PipelineOverview'
 import EnvironmentsGrid from '../components/EnvironmentsGrid'
 import AlertsPanel from '../components/AlertsPanel'
+import Card from '../ui/card'
+import '../styles/dashboard.css'
 
 export default function MainDashboard(){
   return (
-    <div style={{display:'flex',flexDirection:'column',gap:16}}>
+    <div className='dashboard-root'>
+      <section className='dashboard-hero dashboard-fade-in'>
+        <div className='dashboard-hero-title'>Welcome back, Valruna 👋</div>
+        <div className='dashboard-hero-subtitle'>Here’s a fast, friendly snapshot of systems, pipelines, and job progress.</div>
+        <div className='dashboard-quick-actions'>
+          <button className='cursor-pointer dashboard-quick-action'>⚡ Run pipeline</button>
+          <button className='cursor-pointer dashboard-quick-action'>🧭 View board</button>
+          <button className='cursor-pointer dashboard-quick-action'>📌 Pin repo</button>
+          <button className='cursor-pointer dashboard-quick-action'>🔍 Search jobs</button>
+        </div>
+      </section>
+
+      <div className='dashboard-grid dashboard-grid-3 dashboard-fade-in'>
+        <Card title='System health' subtitle='Live snapshot' >
+          <div style={{display:'flex',gap:12,alignItems:'center'}}>
+            <div style={{fontSize:28}}>🟢</div>
+            <div>
+              <div style={{fontWeight:700,fontSize:18}}>All systems operational</div>
+              <div style={{fontSize:12,opacity:0.7}}>Next check in 4 minutes</div>
+            </div>
+          </div>
+        </Card>
+        <Card title='Deployments' subtitle='Last 24 hours'>
+          <div style={{display:'flex',gap:12,alignItems:'center'}}>
+            <div style={{fontSize:28}}>🚀</div>
+            <div>
+              <div style={{fontWeight:700,fontSize:18}}>18 completed</div>
+              <div style={{fontSize:12,opacity:0.7}}>2 in progress</div>
+            </div>
+          </div>
+        </Card>
+        <Card title='Focus' subtitle='Active objective'>
+          <div style={{display:'flex',gap:12,alignItems:'center'}}>
+            <div style={{fontSize:28}}>🎯</div>
+            <div>
+              <div style={{fontWeight:700,fontSize:18}}>Polish dashboard UI</div>
+              <div style={{fontSize:12,opacity:0.7}}>ETA: Today</div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <div className='dashboard-fade-in'>
         <OverviewStats />
-        <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1fr)',gap:16}}>
-          <PipelineOverview />
-          <RecentActivity />
-        </div>
-        <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1fr)',gap:16}}>
-          <EnvironmentsGrid />
-          <AlertsPanel />
-        </div>
+      </div>
+
+      <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
+        <PipelineOverview />
+        <RecentActivity />
+      </div>
+      <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
+        <EnvironmentsGrid />
+        <AlertsPanel />
+      </div>
+
+      <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
+        <Card title='Highlights' subtitle='Friendly insights'>
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {[
+              '✅ CI success rate up 0.6% this week',
+              '✨ New UI polish PR ready for review',
+              '🧩 3 repos need dependency upgrades',
+            ].map((item) => (
+              <div key={item} style={{display:'flex',gap:10,alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+                <span style={{fontSize:18}}>•</span>
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card title='Team pulse' subtitle='People and momentum'>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:12}}>
+            {['Ari', 'Devon', 'Kai', 'Mina'].map((name) => (
+              <div key={name} style={{border:'1px solid var(--border)',borderRadius:12,padding:12,display:'flex',flexDirection:'column',gap:6}}>
+                <div style={{fontSize:22}}>🙂</div>
+                <div style={{fontWeight:600}}>{name}</div>
+                <div style={{fontSize:12,opacity:0.7}}>Active now</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }
