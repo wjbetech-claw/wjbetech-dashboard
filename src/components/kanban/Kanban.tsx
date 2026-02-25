@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -62,6 +62,15 @@ export default function Kanban(){
   const [activeCard, setActiveCard] = useState<Card | null>(null)
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
+
+  useEffect(() => {
+    if(!isOpen) return
+    function onKey(e: KeyboardEvent){
+      if(e.key === 'Escape') setIsOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen])
 
   function persist(next: Column[]){
     setCols(next)
@@ -170,7 +179,7 @@ export default function Kanban(){
       </DndContext>
 
       {isOpen ? (
-        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:50}}>
+        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:50}} role="dialog" aria-modal="true" aria-label="Add new task">
           <div style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:16,padding:20,width:'min(520px,90vw)',boxShadow:'0 20px 40px rgba(15,23,42,0.25)'}}>
             <div style={{fontWeight:700,fontSize:16,marginBottom:6}}>Add new task</div>
             <div style={{fontSize:12,opacity:0.7,marginBottom:12}}>Choose a list and add details.</div>
