@@ -1,14 +1,22 @@
 import React from 'react'
-import Navbar from './ui/navbar'
-// Use MainDashboard as the app's main page
-import MainDashboard from './pages/MainDashboard'
-import './styles/tokens.generated.css'
+import { Routes, Route } from 'react-router-dom'
+import PageLayout from './ui/page-layout'
+import OverviewPage from './pages/OverviewPage'
+import BoardPage from './pages/BoardPage'
+import JobsPage from './pages/JobsPage'
+import ReposPage from './pages/ReposPage'
+import SettingsPage from './pages/SettingsPage'
 
 export default function App(){
   return (
-    <div>
-      <Navbar />
-      <MainDashboard />
-    </div>
+    <PageLayout>
+      <Routes>
+        <Route path='/' element={<OverviewPage/>} />
+        <Route path='/board' element={<BoardPage/>} />
+        <Route path='/jobs' element={<JobsPage/>} />
+        <Route path='/repos' element={<ReposPage/>} />
+        <Route path='/settings' element={<SettingsPage/>} />
+      </Routes>
+    </PageLayout>
   )
 }
