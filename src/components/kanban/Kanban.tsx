@@ -94,7 +94,7 @@ export default function Kanban(){
               <span style={{fontSize:12,opacity:0.7}}>{col.cards.length}</span>
             </div>
             <div style={{display:'flex',flexDirection:'column',gap:10,minHeight:80}}>
-              {col.cards.map(card=>(
+              {col.cards.map(card=> (
                 <div
                   key={card.id}
                   draggable
