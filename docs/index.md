@@ -11,6 +11,8 @@ Quick links
 - Developer guide — docs/developer.md
 - Architecture — docs/architecture.md
 - API — docs/api/overview.md
+- UI components — docs/ui/components.md
+- UX flows — docs/ui/flows.md
 - Deployment — docs/deployment.md
 - Roadmap / TODO — docs/todo.md
 

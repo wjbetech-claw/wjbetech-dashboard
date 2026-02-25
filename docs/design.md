@@ -19,6 +19,10 @@ Component priorities
 1. Dashboard Overview: Active Job card + Job Listings
 2. Kanban Jobs board
 
+Component inventory (detailed)
+- See docs/ui/components.md for full list and states.
+- See docs/ui/flows.md for UX flows.
+
 Typography
 - Font: Inter (variable) for UI and body copy.
 - Base font-size: 16px; scale using rem tokens.
