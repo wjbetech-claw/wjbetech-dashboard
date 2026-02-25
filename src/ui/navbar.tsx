@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import ThemeSwitcher from './theme-switcher'
-import Button from './button'
+import { Button } from './button'
 
 export default function Navbar(){
   return (
@@ -10,12 +10,16 @@ export default function Navbar(){
         <div style={{fontWeight:700}}>wjbetech-dashboard</div>
       </div>
       <div style={{display:'flex',alignItems:'center',gap:8}}>
-        <NavLink to="/board" className="cursor-pointer" style={{marginRight:8,textDecoration:'none'}}>
-          <Button variant="ghost">Board</Button>
-        </NavLink>
-        <NavLink to="/jobs" className="cursor-pointer" style={{marginRight:8,textDecoration:'none'}}>
-          <Button variant="ghost">Jobs</Button>
-        </NavLink>
+        <Button asChild variant="ghost">
+          <NavLink to="/board" className="cursor-pointer" style={{textDecoration:'none'}}>
+            Board
+          </NavLink>
+        </Button>
+        <Button asChild variant="ghost">
+          <NavLink to="/jobs" className="cursor-pointer" style={{textDecoration:'none'}}>
+            Jobs
+          </NavLink>
+        </Button>
         <ThemeSwitcher/>
       </div>
     </header>
