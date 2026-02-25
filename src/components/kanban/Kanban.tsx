@@ -45,6 +45,15 @@ export default function Kanban(){
     persist(next)
   }
 
+
+  function deleteCard(colId:string, cardId:string){
+    const next = cols.map(c=>({...c, cards:[...c.cards]}))
+    const dst = next.find(c=>c.id===colId)
+    if(!dst) return
+    dst.cards = dst.cards.filter(c=>c.id!==cardId)
+    persist(next)
+  }
+
   function addCard(){
     const title = draftTitle.trim()
     if(!title) return
@@ -101,7 +110,7 @@ export default function Kanban(){
                   onDragStart={(e)=>onDragStart(e,col.id,card.id)}
                   style={{padding:12,background:'var(--panel)',borderRadius:12,border:'1px solid var(--border)',cursor:'grab',boxShadow:'0 6px 16px rgba(15,23,42,0.08)'}}
                 >
-                  <div style={{fontWeight:600}}>{card.title}</div>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8}}><div style={{fontWeight:600}}>{card.title}</div><button className='cursor-pointer' onClick={()=>deleteCard(col.id,card.id)} style={{border:'1px solid var(--border)',borderRadius:8,background:'transparent',padding:'2px 6px',fontSize:12}}>🗑️</button></div>
                   {card.description ? <div style={{fontSize:12,opacity:0.7,marginTop:4}}>{card.description}</div> : null}
                   <div style={{display:'flex',gap:6,flexWrap:'wrap',marginTop:8}}>
                     {columnIds.filter(id=>id!==col.id).map(id=>(
