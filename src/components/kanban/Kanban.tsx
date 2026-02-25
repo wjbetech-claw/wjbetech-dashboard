@@ -6,7 +6,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
 type Card = { id: string; title: string; description?: string }
@@ -211,7 +211,7 @@ export default function Kanban(){
 }
 
 function SortableCard({ id, card, colId, onDelete }: { id: string; card: Card; colId: string; onDelete: (colId:string, cardId:string)=>void }){
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = require('@dnd-kit/sortable').useSortable({ id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
