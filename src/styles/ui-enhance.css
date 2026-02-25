@@ -1,0 +1,10 @@
+:root {
+  --nav-active-bg: rgba(99,102,241,0.08);
+  --nav-active-color: var(--primary-500, #6366f1);
+}
+.nav-link-active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-color);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
