@@ -3,6 +3,7 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -152,7 +153,7 @@ export default function Kanban(){
       <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:14}} data-testid="kanban-root">
           {cols.map(col=> (
-            <div key={col.id} style={{background:col.color,padding:12,borderRadius:14,border:'1px solid var(--border)',boxShadow:'0 10px 24px rgba(15,23,42,0.06)'}} id={col.id}>
+            <KanbanColumn key={col.id} col={col}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
                 <h3 style={{margin:0,fontSize:14,letterSpacing:'0.4px',display:'flex',alignItems:'center',gap:6}}>{col.icon} {col.title}</h3>
                 <span style={{fontSize:12,opacity:0.7}}>{col.cards.length}</span>
@@ -164,7 +165,7 @@ export default function Kanban(){
                   ))}
                 </div>
               </SortableContext>
-            </div>
+            </KanbanColumn>
           ))}
         </div>
         <DragOverlay>
@@ -218,8 +219,21 @@ function SortableCard({ id, card, colId, onDelete }: { id: string; card: Card; c
   } as React.CSSProperties
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={{...style, opacity: isDragging ? 0.2 : 1}} {...attributes} {...listeners}>
       <KanbanCard card={card} isDragging={isDragging} onDelete={()=>onDelete(colId, card.id)} />
+    </div>
+  )
+}
+
+function KanbanColumn({ col, children }: { col: Column; children?: React.ReactNode }){
+  const { setNodeRef } = useDroppable({ id: col.id })
+  return (
+    <div ref={setNodeRef} style={{background:col.color,padding:12,borderRadius:14,border:'1px solid var(--border)',boxShadow:'0 10px 24px rgba(15,23,42,0.06)'}} id={col.id}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+        <h3 style={{margin:0,fontSize:14,letterSpacing:'0.4px',display:'flex',alignItems:'center',gap:6}}>{col.icon} {col.title}</h3>
+        <span style={{fontSize:12,opacity:0.7}}>{col.cards.length}</span>
+      </div>
+      {children}
     </div>
   )
 }
