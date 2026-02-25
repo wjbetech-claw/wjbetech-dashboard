@@ -5,3 +5,7 @@ dist
 
 # automation
 .openclaw/
+
+# OpenClaw scratch
+.openclaw/
+.tmp/
