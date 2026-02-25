@@ -6,7 +6,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
 type Card = { id: string; title: string; description?: string }
@@ -22,7 +22,7 @@ const DEFAULT_COLS: Column[] = [
   {id:'done', title:'Done', color:'#ECFDF5', icon:'✅', cards:[{id:'c3',title:'Navbar links',description:'Board/Jobs links'}]},
 ]
 
-function KanbanCard({ card, isDragging }: { card: Card; isDragging?: boolean }){
+function KanbanCard({ card, isDragging, onDelete }: { card: Card; isDragging?: boolean; onDelete?: () => void }){
   return (
     <div
       style={{
@@ -35,7 +35,10 @@ function KanbanCard({ card, isDragging }: { card: Card; isDragging?: boolean }){
         opacity: isDragging ? 0.7 : 1,
       }}
     >
-      <div style={{fontWeight:600}}>{card.title}</div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8}}>
+        <div style={{fontWeight:600}}>{card.title}</div>
+        <button className='cursor-pointer' onClick={onDelete} style={{border:'1px solid var(--border)',borderRadius:8,background:'transparent',padding:'2px 6px',fontSize:12}}>🗑️</button>
+      </div>
       {card.description ? <div style={{fontSize:12,opacity:0.7,marginTop:4}}>{card.description}</div> : null}
     </div>
   )
@@ -77,6 +80,14 @@ export default function Kanban(){
     setIsOpen(false)
   }
 
+  function deleteCard(colId:string, cardId:string){
+    const next = cols.map(c=>({...c, cards:[...c.cards]}))
+    const dst = next.find(c=>c.id===colId)
+    if(!dst) return
+    dst.cards = dst.cards.filter(c=>c.id!==cardId)
+    persist(next)
+  }
+
   const columnIds = useMemo(()=>cols.map(c=>c.id),[cols])
 
   function findCard(cardId: string){
@@ -103,7 +114,6 @@ export default function Kanban(){
     const from = findCard(activeId)
     if(!from) return
 
-    // if dropped on a column, move to end
     if(columnIds.includes(overId)){
       const next = cols.map(c=>({...c, cards:[...c.cards]}))
       const src = next.find(c=>c.id===from.col.id)
@@ -115,7 +125,6 @@ export default function Kanban(){
       return
     }
 
-    // if dropped on another card, reorder within column or move
     const target = findCard(overId)
     if(!target) return
 
@@ -151,7 +160,7 @@ export default function Kanban(){
               <SortableContext items={col.cards.map(c=>c.id)} strategy={verticalListSortingStrategy}>
                 <div style={{display:'flex',flexDirection:'column',gap:10,minHeight:80}}>
                   {col.cards.map(card=> (
-                    <SortableCard key={card.id} id={card.id} card={card} />
+                    <SortableCard key={card.id} id={card.id} card={card} colId={col.id} onDelete={deleteCard} />
                   ))}
                 </div>
               </SortableContext>
@@ -201,7 +210,7 @@ export default function Kanban(){
   )
 }
 
-function SortableCard({ id, card }: { id: string; card: Card }){
+function SortableCard({ id, card, colId, onDelete }: { id: string; card: Card; colId: string; onDelete: (colId:string, cardId:string)=>void }){
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = require('@dnd-kit/sortable').useSortable({ id })
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -210,7 +219,7 @@ function SortableCard({ id, card }: { id: string; card: Card }){
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <KanbanCard card={card} isDragging={isDragging} />
+      <KanbanCard card={card} isDragging={isDragging} onDelete={()=>onDelete(colId, card.id)} />
     </div>
   )
 }
