@@ -45,6 +45,12 @@ Testing (Vitest)
 - Use Vitest for unit tests. Place tests alongside modules with the `.test.ts` or `.test.tsx` suffix.
 - Add a CI job to run tests and report coverage.
 
+Mock data strategy
+
+- While backend is in progress, use mock data in `/src/services/mockApi.ts` and localStorage persistence for Kanban.
+- Frontend should switch to API endpoints by feature flag (e.g., `VITE_USE_API=true`).
+- Keep mock payloads aligned with docs/api/overview.md so swapping is trivial.
+
 CI/CD (GitHub Actions)
 
 - Recommended workflows:
