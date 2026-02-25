@@ -154,10 +154,6 @@ export default function Kanban(){
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:14}} data-testid="kanban-root">
           {cols.map(col=> (
             <KanbanColumn key={col.id} col={col}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-                <h3 style={{margin:0,fontSize:14,letterSpacing:'0.4px',display:'flex',alignItems:'center',gap:6}}>{col.icon} {col.title}</h3>
-                <span style={{fontSize:12,opacity:0.7}}>{col.cards.length}</span>
-              </div>
               <SortableContext items={col.cards.map(c=>c.id)} strategy={verticalListSortingStrategy}>
                 <div style={{display:'flex',flexDirection:'column',gap:10,minHeight:80}}>
                   {col.cards.map(card=> (
