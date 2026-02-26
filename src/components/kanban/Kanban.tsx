@@ -11,17 +11,17 @@ import {
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-type Card = { id: string; title: string; description?: string; tags?: string[]; assignees?: string[] }
+type Card = { id: string; title: string; description?: string; tags?: string[]; assignees?: string[]; updatedAt?: string }
 
 type Column = { id: string; title: string; cards: Card[]; color: string; icon: string }
 
 const STORAGE_KEY = 'wjb_kanban_v4'
 
 const DEFAULT_COLS: Column[] = [
-  {id:'todo', title:'Backlog', color:'#EEF2FF', icon:'🧠', cards:[{id:'c1',title:'Design dashboard polish',description:'Refine spacing + cards', tags:['UI','Design'], assignees:['Ari']}]} ,
-  {id:'doing', title:'In Progress', color:'#ECFEFF', icon:'⚙️', cards:[{id:'c2',title:'CI workflow tweaks',description:'Ensure tests are green', tags:['CI'], assignees:['Devon']}]} ,
+  {id:'todo', title:'Backlog', color:'#EEF2FF', icon:'🧠', cards:[{id:'c1',title:'Design dashboard polish',description:'Refine spacing + cards', tags:['UI','Design'], assignees:['Ari'], updatedAt:'Just now'}]} ,
+  {id:'doing', title:'In Progress', color:'#ECFEFF', icon:'⚙️', cards:[{id:'c2',title:'CI workflow tweaks',description:'Ensure tests are green', tags:['CI'], assignees:['Devon'], updatedAt:'2h ago'}]} ,
   {id:'review', title:'Review', color:'#FFF7ED', icon:'🔍', cards:[]},
-  {id:'done', title:'Done', color:'#ECFDF5', icon:'✅', cards:[{id:'c3',title:'Navbar links',description:'Board/Jobs links', tags:['UI'], assignees:['Mina']}]} ,
+  {id:'done', title:'Done', color:'#ECFDF5', icon:'✅', cards:[{id:'c3',title:'Navbar links',description:'Board/Jobs links', tags:['UI'], assignees:['Mina'], updatedAt:'Yesterday'}]} ,
 ]
 
 function KanbanCard({ card, isDragging, onDelete }: { card: Card; isDragging?: boolean; onDelete?: () => void }){
@@ -52,6 +52,7 @@ function KanbanCard({ card, isDragging, onDelete }: { card: Card; isDragging?: b
           <span key={a} style={{fontSize:11,padding:'2px 6px',border:'1px solid var(--border)',borderRadius:999,background:'var(--panel)'}}>{a}</span>
         ))}</div>
       ) : null}
+      {card.updatedAt ? <div style={{fontSize:11,opacity:0.6,marginTop:6}}>Updated {card.updatedAt}</div> : null}
     </div>
   )
 }
