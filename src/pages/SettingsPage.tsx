@@ -79,6 +79,7 @@ export default function SettingsPage(){
 
       <Card title='Notifications' subtitle='How you receive updates'>
         <div style={{display:'flex',flexDirection:'column',gap:12}}>
+          <div style={{fontSize:12,opacity:0.7}}>Need help? See <a href='https://docs.openclaw.ai' target='_blank' rel='noreferrer'>docs</a>.</div>
           {([
             ['email','Email summaries'],
             ['slack','Slack alerts'],
