@@ -9,12 +9,13 @@ import { ErrorBanner } from '../ui/error-banner'
 import { Skeleton } from '../ui/skeleton'
 import { EmptyState } from '../ui/empty-state'
 import '../styles/dashboard.css'
-import { getOverview } from '../services/api'
+import { getOverview, getActiveJob } from '../services/api'
 
 export default function MainDashboard(){
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [overview, setOverview] = useState<any>(null)
+  const [activeJob, setActiveJob] = useState<any>(null)
 
   function load(){
     let mounted = true
@@ -24,6 +25,10 @@ export default function MainDashboard(){
       .then((data) => { if(mounted) setOverview(data) })
       .catch((err) => { if(mounted) setError(err.message || 'Failed to load') })
       .finally(() => { if(mounted) setLoading(false) })
+
+    getActiveJob()
+      .then((data) => { if(mounted) setActiveJob(data) })
+      .catch(() => {})
     return () => { mounted = false }
   }
 
@@ -46,6 +51,10 @@ export default function MainDashboard(){
       {error && <ErrorBanner message={error} onRetry={load} />}
 
       <div className='dashboard-grid dashboard-grid-3 dashboard-fade-in'>
+        <Card title='Active job' subtitle='Auto-detected focus'>
+          <div style={{fontWeight:700,fontSize:16}}>{activeJob?.title || 'No active job'}</div>
+          <div style={{fontSize:12,opacity:0.7,marginTop:4}}>{activeJob?.signal || 'Awaiting signals'}</div>
+        </Card>
         <Card title='System health' subtitle='Live snapshot' >
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
             <div style={{fontSize:28}} aria-hidden="true">🟢</div>
