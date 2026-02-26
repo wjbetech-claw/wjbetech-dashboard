@@ -45,7 +45,9 @@ export default function JobsPage(){
       <Card title='Active applications' subtitle='Most recent activity'>
         <div style={{display:'flex',gap:8,marginBottom:12}} role="group" aria-label="Job status filter">
           {['all','discovered','saved','applied'].map((f) => (
-            <button key={f} aria-pressed={f===filter} className='cursor-pointer' onClick={()=>setFilter(f)} style={{padding:'4px 10px',border:'1px solid var(--border)',borderRadius:999,background: f===filter ? 'var(--panel)' : 'transparent'}}>{f}</button>
+            <button key={f} aria-pressed={f===filter} className='cursor-pointer' onClick={()=>setFilter(f)} style={{padding:'4px 10px',border:'1px solid var(--border)',borderRadius:999,background: f===filter ? 'var(--panel)' : 'transparent'}}>
+              {f} ({f === 'all' ? jobs.length : jobs.filter(j => j.status === f).length})
+            </button>
           ))}
         </div>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
