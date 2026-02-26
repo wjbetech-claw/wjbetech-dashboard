@@ -48,7 +48,7 @@ export default function MainDashboard(){
       <div className='dashboard-grid dashboard-grid-3 dashboard-fade-in'>
         <Card title='System health' subtitle='Live snapshot' >
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
-            <div style={{fontSize:28}}>🟢</div>
+            <div style={{fontSize:28}} aria-hidden="true">🟢</div>
             <div>
               <div style={{fontWeight:700,fontSize:18}}>{overview?.systemHealth?.message || 'All systems operational'}</div>
               <div style={{fontSize:12,opacity:0.7}}>Next check in 4 minutes</div>
@@ -57,7 +57,7 @@ export default function MainDashboard(){
         </Card>
         <Card title='Deployments' subtitle='Last 24 hours'>
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
-            <div style={{fontSize:28}}>🚀</div>
+            <div style={{fontSize:28}} aria-hidden="true">🚀</div>
             <div>
               <div style={{fontWeight:700,fontSize:18}}>{overview?.deployments?.completed24h ?? 18} completed</div>
               <div style={{fontSize:12,opacity:0.7}}>{overview?.deployments?.inProgress ?? 2} in progress</div>
@@ -66,7 +66,7 @@ export default function MainDashboard(){
         </Card>
         <Card title='Focus' subtitle='Active objective'>
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
-            <div style={{fontSize:28}}>🎯</div>
+            <div style={{fontSize:28}} aria-hidden="true">🎯</div>
             <div>
               <div style={{fontWeight:700,fontSize:18}}>{overview?.activeFocus?.title || 'Polish dashboard UI'}</div>
               <div style={{fontSize:12,opacity:0.7}}>ETA: {overview?.activeFocus?.eta || 'Today'}</div>
@@ -105,7 +105,7 @@ export default function MainDashboard(){
               '🧩 3 repos need dependency upgrades',
             ].map((item) => (
               <div key={item} style={{display:'flex',gap:10,alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
-                <span style={{fontSize:18}}>•</span>
+                <span style={{fontSize:18}} aria-hidden="true">•</span>
                 <span>{item}</span>
               </div>
             ))}
