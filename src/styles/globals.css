@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root{
-  --color-primary: #D9B84C; /* pale gold */
-  --color-accent: #C53030; /* red accent */
+  --color-primary: #6366f1; /* brand */
+  --color-accent: #0ea5e9; /* accent */
 }
 
 [data-theme='dark']{
-  --color-primary: #1E3A8A; /* dark blue */
-  --color-accent: #10B981; /* green */
+  --color-primary: #6366f1;
+  --color-accent: #22d3ee;
 }
 
 body{ background-color: var(--bg); }
