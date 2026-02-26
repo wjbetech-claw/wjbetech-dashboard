@@ -18,9 +18,9 @@ export default function ReposPage(){
   return (
     <div style={{display:'flex',flexDirection:'column',gap:16}}>
       <Card title='Repositories' subtitle='Workflow health & PR activity'>
-        <div style={{display:'flex',gap:8,marginBottom:12}}>
+        <div style={{display:'flex',gap:8,marginBottom:12}} role="group" aria-label="Repo status filter">
           {['all','green','yellow','red'].map((f) => (
-            <button key={f} className='cursor-pointer' onClick={()=>setFilter(f)} style={{padding:'4px 10px',border:'1px solid var(--border)',borderRadius:999,background: f===filter ? 'var(--panel)' : 'transparent'}}>{f}</button>
+            <button key={f} aria-pressed={f===filter} className='cursor-pointer' onClick={()=>setFilter(f)} style={{padding:'4px 10px',border:'1px solid var(--border)',borderRadius:999,background: f===filter ? 'var(--panel)' : 'transparent'}}>{f}</button>
           ))}
         </div>
         <Table>
