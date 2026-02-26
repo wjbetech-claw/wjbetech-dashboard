@@ -62,6 +62,7 @@ export default function SettingsPage(){
             <div>
               <div style={{fontWeight:600}}>GitHub</div>
               <div style={{fontSize:12,opacity:0.7}}>wjbetech-claw</div>
+              <a href='https://github.com/settings/apps' target='_blank' rel='noreferrer' style={{fontSize:12}}>Manage connection</a>
             </div>
             <Badge variant='success'>Connected</Badge>
           </div>
@@ -69,6 +70,7 @@ export default function SettingsPage(){
             <div>
               <div style={{fontWeight:600}}>Vercel</div>
               <div style={{fontSize:12,opacity:0.7}}>Deploy status</div>
+              <a href='https://vercel.com/account/tokens' target='_blank' rel='noreferrer' style={{fontSize:12}}>Connect Vercel</a>
             </div>
             <Badge variant='warning'>Needs auth</Badge>
           </div>
