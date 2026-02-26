@@ -9,3 +9,15 @@ export async function getRepos(){
   if(!res.ok) throw new Error('Failed to load repos')
   return res.json()
 }
+
+export async function getJobs(){
+  const res = await fetch('/api/jobs')
+  if(!res.ok) throw new Error('Failed to load jobs')
+  return res.json()
+}
+
+export async function updateJobStatus(id: string, status: string){
+  const res = await fetch(`/api/jobs/${id}/${status}`, { method: 'POST' })
+  if(!res.ok) throw new Error('Failed to update job')
+  return res.json()
+}
