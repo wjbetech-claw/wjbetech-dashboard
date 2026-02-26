@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import PageLayout from './ui/page-layout'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import OfflineBanner from './components/OfflineBanner'
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
@@ -12,6 +13,8 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 export default function App(){
   return (
     <PageLayout>
+      <ErrorBoundary>
+
       {!navigator.onLine && <OfflineBanner />}
 
       <Suspense fallback={<div>Loading…</div>}>
@@ -23,6 +26,7 @@ export default function App(){
           <Route path='/settings' element={<SettingsPage/>} />
         </Routes>
       </Suspense>
+          </ErrorBoundary>
     </PageLayout>
   )
 }
