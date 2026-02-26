@@ -4,6 +4,7 @@ import { overviewRouter } from './routes/overview'
 import { reposRouter } from './routes/repos'
 import { jobsRouter } from './routes/jobs'
 import { healthRouter } from './routes/health'
+import { activeJobRouter } from './routes/activeJob'
 import { startSyncWorker } from './workers/syncWorker'
 
 dotenv.config()
@@ -17,6 +18,7 @@ app.use('/api/overview', overviewRouter)
 app.use('/api/repos', reposRouter)
 app.use('/api/jobs', jobsRouter)
 app.use('/api/health', healthRouter)
+app.use('/api/active-job', activeJobRouter)
 
 app.listen(port, () => {
   console.log(`Backend listening on :${port}`)
