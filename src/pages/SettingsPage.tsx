@@ -40,7 +40,9 @@ export default function SettingsPage(){
               <div style={{fontWeight:600}}>Theme</div>
               <div style={{fontSize:12,opacity:0.7}}>Light / dark mode</div>
             </div>
+            <label style={{fontSize:12,opacity:0.7,marginRight:8}} htmlFor="theme-select">Theme</label>
             <select
+              id="theme-select"
               value={settings.theme}
               onChange={(e)=>setSettings(s=>({...s, theme: e.target.value as 'light'|'dark'}))}
               style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}
@@ -77,6 +79,7 @@ export default function SettingsPage(){
               <span>{label}</span>
               <input
                 type='checkbox'
+                aria-label={label}
                 checked={settings.notifications[key]}
                 onChange={(e)=>setSettings(s=>({...s, notifications: {...s.notifications, [key]: e.target.checked}}))}
               />
