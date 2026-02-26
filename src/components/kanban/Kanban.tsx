@@ -11,17 +11,17 @@ import {
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-type Card = { id: string; title: string; description?: string }
+type Card = { id: string; title: string; description?: string; tags?: string[] }
 
 type Column = { id: string; title: string; cards: Card[]; color: string; icon: string }
 
 const STORAGE_KEY = 'wjb_kanban_v4'
 
 const DEFAULT_COLS: Column[] = [
-  {id:'todo', title:'Backlog', color:'#EEF2FF', icon:'🧠', cards:[{id:'c1',title:'Design dashboard polish',description:'Refine spacing + cards'}]},
-  {id:'doing', title:'In Progress', color:'#ECFEFF', icon:'⚙️', cards:[{id:'c2',title:'CI workflow tweaks',description:'Ensure tests are green'}]},
+  {id:'todo', title:'Backlog', color:'#EEF2FF', icon:'🧠', cards:[{id:'c1',title:'Design dashboard polish',description:'Refine spacing + cards', tags:['UI','Design']}]} ,
+  {id:'doing', title:'In Progress', color:'#ECFEFF', icon:'⚙️', cards:[{id:'c2',title:'CI workflow tweaks',description:'Ensure tests are green', tags:['CI']}]} ,
   {id:'review', title:'Review', color:'#FFF7ED', icon:'🔍', cards:[]},
-  {id:'done', title:'Done', color:'#ECFDF5', icon:'✅', cards:[{id:'c3',title:'Navbar links',description:'Board/Jobs links'}]},
+  {id:'done', title:'Done', color:'#ECFDF5', icon:'✅', cards:[{id:'c3',title:'Navbar links',description:'Board/Jobs links', tags:['UI']}]} ,
 ]
 
 function KanbanCard({ card, isDragging, onDelete }: { card: Card; isDragging?: boolean; onDelete?: () => void }){
@@ -42,6 +42,11 @@ function KanbanCard({ card, isDragging, onDelete }: { card: Card; isDragging?: b
         <button className='cursor-pointer' onClick={onDelete} style={{border:'1px solid var(--border)',borderRadius:8,background:'transparent',padding:'2px 6px',fontSize:12}}>🗑️</button>
       </div>
       {card.description ? <div style={{fontSize:12,opacity:0.7,marginTop:4}}>{card.description}</div> : null}
+      {card.tags ? (
+        <div style={{display:'flex',gap:6,flexWrap:'wrap',marginTop:6}}>{card.tags.map(t => (
+          <span key={t} style={{fontSize:11,padding:'2px 6px',border:'1px solid var(--border)',borderRadius:999}}>{t}</span>
+        ))}</div>
+      ) : null}
     </div>
   )
 }
