@@ -58,6 +58,7 @@ export default function Kanban(){
   const [draftTitle,setDraftTitle] = useState('')
   const [draftDesc,setDraftDesc] = useState('')
   const [draftCol,setDraftCol] = useState(cols[0]?.id || 'todo')
+  const inputRef = React.useRef<HTMLInputElement | null>(null)
 
   const [activeCard, setActiveCard] = useState<Card | null>(null)
 
@@ -69,6 +70,7 @@ export default function Kanban(){
       if(e.key === 'Escape') setIsOpen(false)
     }
     window.addEventListener('keydown', onKey)
+    inputRef.current?.focus()
     return () => window.removeEventListener('keydown', onKey)
   }, [isOpen])
 
@@ -185,6 +187,7 @@ export default function Kanban(){
             <div style={{fontSize:12,opacity:0.7,marginBottom:12}}>Choose a list and add details.</div>
             <div style={{display:'flex',flexDirection:'column',gap:10}}>
               <input
+                ref={inputRef}
                 value={draftTitle}
                 onChange={(e)=>setDraftTitle(e.target.value)}
                 placeholder='Task title'
