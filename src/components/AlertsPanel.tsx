@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Card from '../ui/card'
 
 const alerts = [
@@ -7,7 +7,7 @@ const alerts = [
   { title: 'SSL expiry', meta: 'cdn-edge • 12 days left', severity: 'low' },
 ]
 
-export default function AlertsPanel(){
+function AlertsPanel(){
   return (
     <Card title='Alerts' subtitle='Active notices to review'>
       <div style={{display:'flex',flexDirection:'column',gap:10}}>
@@ -24,3 +24,6 @@ export default function AlertsPanel(){
     </Card>
   )
 }
+
+
+export default memo(AlertsPanel)
