@@ -70,6 +70,9 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-fade-in { animation: none; }
+}
 @media (max-width: 900px) {
   .dashboard-grid-2, .dashboard-grid-3 { grid-template-columns: 1fr; }
 }
