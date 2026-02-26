@@ -111,7 +111,7 @@ export default function MainDashboard(){
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:12}}>
             {['Ari', 'Devon', 'Kai', 'Mina'].map((name) => (
               <div key={name} style={{border:'1px solid var(--border)',borderRadius:12,padding:12,display:'flex',flexDirection:'column',gap:6}}>
-                <div style={{fontSize:22}}>🙂</div>
+                <img src='https://placehold.co/48x48' alt={`${name} avatar`} loading='lazy' style={{width:32,height:32,borderRadius:999}} />
                 <div style={{fontWeight:600}}>{name}</div>
                 <div style={{fontSize:12,opacity:0.7}}>Active now</div>
               </div>
