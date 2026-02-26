@@ -3,6 +3,7 @@ import Card from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Table, THead, TBody, TR, TH, TD } from '../ui/table'
 import { getRepos } from '../services/api'
+import { EmptyState } from '../ui/empty-state'
 
 export default function ReposPage(){
   const [repos, setRepos] = useState<any[]>([])
@@ -32,7 +33,9 @@ export default function ReposPage(){
             </TR>
           </THead>
           <TBody>
-            {filtered.map((repo) => (
+            {filtered.length === 0 ? (
+              <TR><TD colSpan={4}><EmptyState title='No repositories' message='No repo data yet.' /></TD></TR>
+            ) : filtered.map((repo) => (
               <TR key={repo.id}>
                 <TD><strong>{repo.name}</strong></TD>
                 <TD>
