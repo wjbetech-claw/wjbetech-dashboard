@@ -6,6 +6,7 @@ const EnvironmentsGrid = lazy(() => import('../components/EnvironmentsGrid'))
 const AlertsPanel = lazy(() => import('../components/AlertsPanel'))
 import Card from '../ui/card'
 import { ErrorBanner } from '../ui/error-banner'
+import { Skeleton } from '../ui/skeleton'
 import '../styles/dashboard.css'
 import { getOverview } from '../services/api'
 
@@ -36,7 +37,7 @@ export default function MainDashboard(){
         </div>
       </section>
 
-      {loading && <Card title='Loading' subtitle='Fetching overview data…'>Please wait.</Card>}
+      {loading && <Card title='Loading' subtitle='Fetching overview data…'><Skeleton height={14} /><div style={{height:8}} /><Skeleton height={14} /></Card>}
       {error && <ErrorBanner message={error} />}
 
       <div className='dashboard-grid dashboard-grid-3 dashboard-fade-in'>
