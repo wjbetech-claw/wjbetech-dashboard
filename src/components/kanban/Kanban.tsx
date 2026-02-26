@@ -156,7 +156,7 @@ export default function Kanban(){
     <div>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
         <div style={{fontWeight:700,display:'flex',alignItems:'center',gap:8}}>🗂️ Kanban board</div>
-        <button className='cursor-pointer' onClick={()=>setIsOpen(true)} style={{padding:'8px 12px',border:'1px solid var(--border)',borderRadius:10,background:'var(--panel)'}}>+ Add task</button>
+        <button className='cursor-pointer' aria-label='Add task' onClick={()=>setIsOpen(true)} style={{padding:'8px 12px',border:'1px solid var(--border)',borderRadius:10,background:'var(--panel)'}}>+ Add task</button>
       </div>
 
       <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>

@@ -55,8 +55,8 @@ export default function JobsPage(){
               </div>
               <div style={{display:'flex',gap:8,alignItems:'center'}}>
                 <Badge variant={job.status === 'saved' ? 'warning' : job.status === 'applied' ? 'success' : 'outline'}>{job.status}</Badge>
-                <button className='cursor-pointer' onClick={()=>onAction(job.id, 'save')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Save</button>
-                <button className='cursor-pointer' onClick={()=>onAction(job.id, 'apply')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Apply</button>
+                <button className='cursor-pointer' aria-label={`Save ${job.title}`} onClick={()=>onAction(job.id, 'save')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Save</button>
+                <button className='cursor-pointer' aria-label={`Apply to ${job.title}`} onClick={()=>onAction(job.id, 'apply')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Apply</button>
               </div>
             </div>
           ))}
