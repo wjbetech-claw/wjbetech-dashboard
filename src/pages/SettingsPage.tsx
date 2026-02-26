@@ -37,6 +37,13 @@ export default function SettingsPage(){
         <div style={{display:'flex',flexDirection:'column',gap:12}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
             <div>
+              <div style={{fontWeight:600}}>Sync status</div>
+              <div style={{fontSize:12,opacity:0.7}}>Last sync: just now</div>
+            </div>
+            <button className='cursor-pointer' style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Sync now</button>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+            <div>
               <div style={{fontWeight:600}}>Theme</div>
               <div style={{fontSize:12,opacity:0.7}}>Light / dark mode</div>
             </div>
