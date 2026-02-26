@@ -30,11 +30,12 @@ export default function ReposPage(){
               <TH>Status</TH>
               <TH>Open PRs</TH>
               <TH>Workflows</TH>
+              <TH>Updated</TH>
             </TR>
           </THead>
           <TBody>
             {filtered.length === 0 ? (
-              <TR><TD colSpan={4}><EmptyState title='No repositories' message='No repo data yet.' /></TD></TR>
+              <TR><TD colSpan={5}><EmptyState title='No repositories' message='No repo data yet.' /></TD></TR>
             ) : filtered.map((repo) => (
               <TR key={repo.id}>
                 <TD>
@@ -51,6 +52,7 @@ export default function ReposPage(){
                 </TD>
                 <TD>{repo.openPRs ?? 0}</TD>
                 <TD>{repo.workflows ?? 0}</TD>
+                <TD>{repo.updatedAt || '—'}</TD>
               </TR>
             ))}
           </TBody>
