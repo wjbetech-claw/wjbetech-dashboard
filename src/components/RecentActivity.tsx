@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Card from '../ui/card'
 
 const items = [
@@ -8,7 +8,7 @@ const items = [
   { title: 'Incident resolved', meta: 'auth-service • 1h ago', status: 'success' },
 ]
 
-export default function RecentActivity(){
+function RecentActivity(){
   return (
     <Card title='Recent activity' subtitle='Latest updates across environments'>
       <div style={{display:'flex',flexDirection:'column',gap:10}}>
@@ -25,3 +25,6 @@ export default function RecentActivity(){
     </Card>
   )
 }
+
+
+export default memo(RecentActivity)
