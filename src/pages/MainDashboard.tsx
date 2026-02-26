@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import OverviewStats from '../components/OverviewStats'
 import RecentActivity from '../components/RecentActivity'
 import PipelineOverview from '../components/PipelineOverview'
@@ -6,8 +6,22 @@ import EnvironmentsGrid from '../components/EnvironmentsGrid'
 import AlertsPanel from '../components/AlertsPanel'
 import Card from '../ui/card'
 import '../styles/dashboard.css'
+import { getOverview } from '../services/api'
 
 export default function MainDashboard(){
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [overview, setOverview] = useState<any>(null)
+
+  useEffect(() => {
+    let mounted = true
+    getOverview()
+      .then((data) => { if(mounted) setOverview(data) })
+      .catch((err) => { if(mounted) setError(err.message || 'Failed to load') })
+      .finally(() => { if(mounted) setLoading(false) })
+    return () => { mounted = false }
+  }, [])
+
   return (
     <div className='dashboard-root'>
       <section className='dashboard-hero dashboard-fade-in'>
@@ -21,12 +35,15 @@ export default function MainDashboard(){
         </div>
       </section>
 
+      {loading && <Card title='Loading' subtitle='Fetching overview data…'>Please wait.</Card>}
+      {error && <Card title='Error' subtitle='Could not load overview'>{error}</Card>}
+
       <div className='dashboard-grid dashboard-grid-3 dashboard-fade-in'>
         <Card title='System health' subtitle='Live snapshot' >
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
             <div style={{fontSize:28}}>🟢</div>
             <div>
-              <div style={{fontWeight:700,fontSize:18}}>All systems operational</div>
+              <div style={{fontWeight:700,fontSize:18}}>{overview?.systemHealth?.message || 'All systems operational'}</div>
               <div style={{fontSize:12,opacity:0.7}}>Next check in 4 minutes</div>
             </div>
           </div>
@@ -35,8 +52,8 @@ export default function MainDashboard(){
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
             <div style={{fontSize:28}}>🚀</div>
             <div>
-              <div style={{fontWeight:700,fontSize:18}}>18 completed</div>
-              <div style={{fontSize:12,opacity:0.7}}>2 in progress</div>
+              <div style={{fontWeight:700,fontSize:18}}>{overview?.deployments?.completed24h ?? 18} completed</div>
+              <div style={{fontSize:12,opacity:0.7}}>{overview?.deployments?.inProgress ?? 2} in progress</div>
             </div>
           </div>
         </Card>
@@ -44,8 +61,8 @@ export default function MainDashboard(){
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
             <div style={{fontSize:28}}>🎯</div>
             <div>
-              <div style={{fontWeight:700,fontSize:18}}>Polish dashboard UI</div>
-              <div style={{fontSize:12,opacity:0.7}}>ETA: Today</div>
+              <div style={{fontWeight:700,fontSize:18}}>{overview?.activeFocus?.title || 'Polish dashboard UI'}</div>
+              <div style={{fontSize:12,opacity:0.7}}>ETA: {overview?.activeFocus?.eta || 'Today'}</div>
             </div>
           </div>
         </Card>
