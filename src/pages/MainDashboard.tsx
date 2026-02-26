@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import OverviewStats from '../components/OverviewStats'
-import RecentActivity from '../components/RecentActivity'
-import PipelineOverview from '../components/PipelineOverview'
-import EnvironmentsGrid from '../components/EnvironmentsGrid'
-import AlertsPanel from '../components/AlertsPanel'
+import React, { useEffect, useState, Suspense, lazy } from 'react'
+const OverviewStats = lazy(() => import('../components/OverviewStats'))
+const RecentActivity = lazy(() => import('../components/RecentActivity'))
+const PipelineOverview = lazy(() => import('../components/PipelineOverview'))
+const EnvironmentsGrid = lazy(() => import('../components/EnvironmentsGrid'))
+const AlertsPanel = lazy(() => import('../components/AlertsPanel'))
 import Card from '../ui/card'
 import { ErrorBanner } from '../ui/error-banner'
 import '../styles/dashboard.css'
@@ -69,18 +69,24 @@ export default function MainDashboard(){
         </Card>
       </div>
 
-      <div className='dashboard-fade-in'>
-        <OverviewStats />
-      </div>
+      <Suspense fallback={<div>Loading…</div>}>
+        <div className='dashboard-fade-in'>
+          <OverviewStats />
+        </div>
+      </Suspense>
 
-      <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
-        <PipelineOverview />
-        <RecentActivity />
-      </div>
-      <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
-        <EnvironmentsGrid />
-        <AlertsPanel />
-      </div>
+      <Suspense fallback={<div>Loading…</div>}>
+        <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
+          <PipelineOverview />
+          <RecentActivity />
+        </div>
+      </Suspense>
+      <Suspense fallback={<div>Loading…</div>}>
+        <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
+          <EnvironmentsGrid />
+          <AlertsPanel />
+        </div>
+      </Suspense>
 
       <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
         <Card title='Highlights' subtitle='Friendly insights'>
