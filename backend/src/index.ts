@@ -1,5 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import { startSyncWorker } from './workers/syncWorker'
 
 dotenv.config()
 
@@ -12,4 +13,5 @@ app.get('/health', (_req, res) => {
 
 app.listen(port, () => {
   console.log(`Backend listening on :${port}`)
+  startSyncWorker()
 })
