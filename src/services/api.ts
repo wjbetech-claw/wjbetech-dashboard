@@ -21,3 +21,9 @@ export async function updateJobStatus(id: string, status: string){
   if(!res.ok) throw new Error('Failed to update job')
   return res.json()
 }
+
+export async function getActiveJob(){
+  const res = await fetch('/api/active-job')
+  if(!res.ok) throw new Error('Failed to load active job')
+  return res.json()
+}
