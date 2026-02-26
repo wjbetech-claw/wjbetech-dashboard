@@ -7,6 +7,7 @@ const AlertsPanel = lazy(() => import('../components/AlertsPanel'))
 import Card from '../ui/card'
 import { ErrorBanner } from '../ui/error-banner'
 import { Skeleton } from '../ui/skeleton'
+import { EmptyState } from '../ui/empty-state'
 import '../styles/dashboard.css'
 import { getOverview } from '../services/api'
 
@@ -92,7 +93,9 @@ export default function MainDashboard(){
       <div className='dashboard-grid dashboard-grid-2 dashboard-fade-in'>
         <Card title='Highlights' subtitle='Friendly insights'>
           <div style={{display:'flex',flexDirection:'column',gap:10}}>
-            {[
+            {(['✅ CI success rate up 0.6% this week','✨ New UI polish PR ready for review','🧩 3 repos need dependency upgrades'].length === 0) ? (
+            <EmptyState title='No highlights' message='No updates yet.' />
+          ) : [
               '✅ CI success rate up 0.6% this week',
               '✨ New UI polish PR ready for review',
               '🧩 3 repos need dependency upgrades',
