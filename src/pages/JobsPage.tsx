@@ -8,6 +8,10 @@ export default function JobsPage(){
   const [jobs, setJobs] = useState<any[]>([])
   const [filter, setFilter] = useState<string>('all')
 
+  const openCount = jobs.length
+  const savedCount = jobs.filter(j => j.status === 'saved').length
+  const appliedCount = jobs.filter(j => j.status === 'applied').length
+
   useEffect(() => {
     getJobs().then((data) => setJobs(data.jobs || []))
   }, [])
@@ -24,15 +28,15 @@ export default function JobsPage(){
       <Card title='Jobs pipeline' subtitle='Track applications and job discovery'>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
           <Card title='Open roles' subtitle='Active listings'>
-            <div style={{fontSize:24,fontWeight:700}}>48</div>
+            <div style={{fontSize:24,fontWeight:700}}>{openCount}</div>
             <div style={{fontSize:12,opacity:0.7}}>+6 this week</div>
           </Card>
           <Card title='Saved' subtitle='Shortlist'>
-            <div style={{fontSize:24,fontWeight:700}}>12</div>
+            <div style={{fontSize:24,fontWeight:700}}>{savedCount}</div>
             <div style={{fontSize:12,opacity:0.7}}>Review today</div>
           </Card>
           <Card title='Applied' subtitle='In progress'>
-            <div style={{fontSize:24,fontWeight:700}}>9</div>
+            <div style={{fontSize:24,fontWeight:700}}>{appliedCount}</div>
             <div style={{fontSize:12,opacity:0.7}}>2 awaiting reply</div>
           </Card>
         </div>
