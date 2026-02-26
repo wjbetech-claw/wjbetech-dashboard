@@ -68,6 +68,17 @@ export default function Kanban(){
     if(!isOpen) return
     function onKey(e: KeyboardEvent){
       if(e.key === 'Escape') setIsOpen(false)
+      if(e.key === 'Tab'){
+        const focusables = Array.from(document.querySelectorAll<HTMLElement>("[data-modal='kanban'] button, [data-modal='kanban'] input, [data-modal='kanban'] select, [data-modal='kanban'] textarea"))
+        if(focusables.length === 0) return
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        if(e.shiftKey && document.activeElement === first){
+          e.preventDefault(); last.focus()
+        } else if(!e.shiftKey && document.activeElement === last){
+          e.preventDefault(); first.focus()
+        }
+      }
     }
     window.addEventListener('keydown', onKey)
     inputRef.current?.focus()
@@ -182,7 +193,7 @@ export default function Kanban(){
 
       {isOpen ? (
         <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:50}} role="dialog" aria-modal="true" aria-label="Add new task">
-          <div style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:16,padding:20,width:'min(520px,90vw)',boxShadow:'0 20px 40px rgba(15,23,42,0.25)'}}>
+          <div data-modal='kanban' style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:16,padding:20,width:'min(520px,90vw)',boxShadow:'0 20px 40px rgba(15,23,42,0.25)'}}>
             <div style={{fontWeight:700,fontSize:16,marginBottom:6}}>Add new task</div>
             <div style={{fontSize:12,opacity:0.7,marginBottom:12}}>Choose a list and add details.</div>
             <div style={{display:'flex',flexDirection:'column',gap:10}}>
