@@ -59,7 +59,7 @@ export default function ReposPage(){
                 <div style={{fontWeight:600}}>{item}</div>
                 <div style={{fontSize:12,opacity:0.7}}>wjbetech-dashboard • awaiting review</div>
               </div>
-              <button className='cursor-pointer' style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Open</button>
+              <button className='cursor-pointer' aria-label={`Open PR ${item}`} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Open</button>
             </div>
           ))}
         </div>
