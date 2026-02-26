@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Card from '../ui/card'
 import { Badge } from '../ui/badge'
 import { getJobs, updateJobStatus } from '../services/api'
+import { EmptyState } from '../ui/empty-state'
 
 export default function JobsPage(){
   const [jobs, setJobs] = useState<any[]>([])
@@ -44,7 +45,9 @@ export default function JobsPage(){
           ))}
         </div>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
-          {filtered.map((job) => (
+          {filtered.length === 0 ? (
+            <EmptyState title='No jobs found' message='Try another filter or check back later.' />
+          ) : filtered.map((job) => (
             <div key={job.id} style={{display:'grid',gridTemplateColumns:'1fr auto',gap:12,alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
               <div>
                 <div style={{fontWeight:600}}>{job.title}</div>
