@@ -16,14 +16,18 @@ export default function MainDashboard(){
   const [error, setError] = useState<string | null>(null)
   const [overview, setOverview] = useState<any>(null)
 
-  useEffect(() => {
+  function load(){
     let mounted = true
+    setLoading(true)
+    setError(null)
     getOverview()
       .then((data) => { if(mounted) setOverview(data) })
       .catch((err) => { if(mounted) setError(err.message || 'Failed to load') })
       .finally(() => { if(mounted) setLoading(false) })
     return () => { mounted = false }
-  }, [])
+  }
+
+  useEffect(() => load(), [])
 
   return (
     <div className='dashboard-root'>
@@ -39,7 +43,7 @@ export default function MainDashboard(){
       </section>
 
       {loading && <Card title='Loading' subtitle='Fetching overview data…'><Skeleton height={14} /><div style={{height:8}} /><Skeleton height={14} /></Card>}
-      {error && <ErrorBanner message={error} />}
+      {error && <ErrorBanner message={error} onRetry={load} />}
 
       <div className='dashboard-grid dashboard-grid-3 dashboard-fade-in'>
         <Card title='System health' subtitle='Live snapshot' >
