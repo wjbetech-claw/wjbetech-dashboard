@@ -52,6 +52,9 @@ export default function JobsPage(){
               <div>
                 <div style={{fontWeight:600}}>{job.title}</div>
                 <div style={{fontSize:12,opacity:0.7}}>{job.company}</div>
+                {job.url ? (
+                  <a href={job.url} target='_blank' rel='noreferrer' style={{fontSize:12,marginTop:4,display:'inline-block'}}>View posting</a>
+                ) : null}
               </div>
               <div style={{display:'flex',gap:8,alignItems:'center'}}>
                 <Badge variant={job.status === 'saved' ? 'warning' : job.status === 'applied' ? 'success' : 'outline'}>{job.status}</Badge>
