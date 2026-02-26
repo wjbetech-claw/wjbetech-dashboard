@@ -3,11 +3,12 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  KeyboardSensor,
   useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
 type Card = { id: string; title: string; description?: string }
@@ -62,7 +63,10 @@ export default function Kanban(){
 
   const [activeCard, setActiveCard] = useState<Card | null>(null)
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
 
   useEffect(() => {
     if(!isOpen) return
