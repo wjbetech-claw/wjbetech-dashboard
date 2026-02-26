@@ -178,7 +178,9 @@ export default function Kanban(){
             <KanbanColumn key={col.id} col={col}>
               <SortableContext items={col.cards.map(c=>c.id)} strategy={verticalListSortingStrategy}>
                 <div style={{display:'flex',flexDirection:'column',gap:10,minHeight:80}}>
-                  {col.cards.map(card=> (
+                  {col.cards.length === 0 ? (
+                    <div style={{fontSize:12,opacity:0.7}}>No tasks yet</div>
+                  ) : col.cards.map(card=> (
                     <SortableCard key={card.id} id={card.id} card={card} colId={col.id} onDelete={deleteCard} />
                   ))}
                 </div>
