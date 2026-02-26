@@ -56,6 +56,7 @@ export default function JobsPage(){
               <div>
                 <div style={{fontWeight:600}}>{job.title}</div>
                 <div style={{fontSize:12,opacity:0.7}}>{job.company}</div>
+                {job.location ? <div style={{fontSize:12,opacity:0.7}}>{job.location}</div> : null}
                 {job.url ? (
                   <a href={job.url} target='_blank' rel='noreferrer' style={{fontSize:12,marginTop:4,display:'inline-block'}}>View posting</a>
                 ) : null}
@@ -64,6 +65,7 @@ export default function JobsPage(){
                 <Badge variant={job.status === 'saved' ? 'warning' : job.status === 'applied' ? 'success' : 'outline'}>{job.status}</Badge>
                 <button className='cursor-pointer' aria-label={`Save ${job.title}`} onClick={()=>onAction(job.id, 'save')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Save</button>
                 <button className='cursor-pointer' aria-label={`Apply to ${job.title}`} onClick={()=>onAction(job.id, 'apply')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Apply</button>
+                <button className='cursor-pointer' aria-label={`Archive ${job.title}`} onClick={()=>onAction(job.id, 'archive')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Archive</button>
               </div>
             </div>
           ))}
