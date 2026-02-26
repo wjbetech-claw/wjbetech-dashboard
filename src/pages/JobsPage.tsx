@@ -1,13 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from '../ui/card'
-
-const jobs = [
-  { title: 'Senior Frontend Engineer', company: 'WJB Labs', location: 'Remote', type: 'Full-time', status: 'Applied' },
-  { title: 'Platform Engineer', company: 'Nimbus', location: 'NYC / Hybrid', type: 'Full-time', status: 'Saved' },
-  { title: 'Design Systems Lead', company: 'Arcadia', location: 'Remote', type: 'Contract', status: 'New' },
-]
+import { Badge } from '../ui/badge'
+import { getJobs, updateJobStatus } from '../services/api'
 
 export default function JobsPage(){
+  const [jobs, setJobs] = useState<any[]>([])
+  const [filter, setFilter] = useState<string>('all')
+
+  useEffect(() => {
+    getJobs().then((data) => setJobs(data.jobs || []))
+  }, [])
+
+  const filtered = filter === 'all' ? jobs : jobs.filter((j) => j.status === filter)
+
+  function onAction(id: string, action: 'save' | 'apply'){
+    updateJobStatus(id, action).catch(() => {})
+    setJobs((prev) => prev.map((j) => j.id === id ? { ...j, status: action === 'save' ? 'saved' : 'applied' } : j))
+  }
+
   return (
     <div style={{display:'flex',flexDirection:'column',gap:16}}>
       <Card title='Jobs pipeline' subtitle='Track applications and job discovery'>
@@ -28,26 +38,23 @@ export default function JobsPage(){
       </Card>
 
       <Card title='Active applications' subtitle='Most recent activity'>
-        <div style={{display:'flex',flexDirection:'column',gap:10}}>
-          {jobs.map((job) => (
-            <div key={job.title} style={{display:'grid',gridTemplateColumns:'1fr auto',gap:12,alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
-              <div>
-                <div style={{fontWeight:600}}>{job.title}</div>
-                <div style={{fontSize:12,opacity:0.7}}>{job.company} • {job.location} • {job.type}</div>
-              </div>
-              <span style={{fontSize:12,padding:'4px 8px',borderRadius:999,border:'1px solid var(--border)'}}>{job.status}</span>
-            </div>
+        <div style={{display:'flex',gap:8,marginBottom:12}}>
+          {['all','discovered','saved','applied'].map((f) => (
+            <button key={f} className='cursor-pointer' onClick={()=>setFilter(f)} style={{padding:'4px 10px',border:'1px solid var(--border)',borderRadius:999,background: f===filter ? 'var(--panel)' : 'transparent'}}>{f}</button>
           ))}
         </div>
-      </Card>
-
-      <Card title='Job discovery' subtitle='Suggested matches'>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:12}}>
-          {['Full‑stack Engineer', 'DevRel Lead', 'AI Platform Engineer'].map((role) => (
-            <div key={role} style={{border:'1px solid var(--border)',borderRadius:10,padding:12}}>
-              <div style={{fontWeight:600}}>{role}</div>
-              <div style={{fontSize:12,opacity:0.7,marginTop:6}}>Remote • High match</div>
-              <button className='cursor-pointer' style={{marginTop:10,padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>View details</button>
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          {filtered.map((job) => (
+            <div key={job.id} style={{display:'grid',gridTemplateColumns:'1fr auto',gap:12,alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+              <div>
+                <div style={{fontWeight:600}}>{job.title}</div>
+                <div style={{fontSize:12,opacity:0.7}}>{job.company}</div>
+              </div>
+              <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                <Badge variant={job.status === 'saved' ? 'warning' : job.status === 'applied' ? 'success' : 'outline'}>{job.status}</Badge>
+                <button className='cursor-pointer' onClick={()=>onAction(job.id, 'save')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Save</button>
+                <button className='cursor-pointer' onClick={()=>onAction(job.id, 'apply')} style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Apply</button>
+              </div>
             </div>
           ))}
         </div>
