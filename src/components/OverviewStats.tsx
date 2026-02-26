@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Card from '../ui/card'
 
 const stats = [
@@ -8,7 +8,7 @@ const stats = [
   { label: 'Success rate', value: '98.4%', delta: '+0.6%' },
 ]
 
-export default function OverviewStats(){
+function OverviewStats(){
   return (
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12}}>
       {stats.map((item) => (
@@ -21,3 +21,6 @@ export default function OverviewStats(){
     </div>
   )
 }
+
+
+export default memo(OverviewStats)
