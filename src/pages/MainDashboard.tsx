@@ -5,6 +5,7 @@ import PipelineOverview from '../components/PipelineOverview'
 import EnvironmentsGrid from '../components/EnvironmentsGrid'
 import AlertsPanel from '../components/AlertsPanel'
 import Card from '../ui/card'
+import { ErrorBanner } from '../ui/error-banner'
 import '../styles/dashboard.css'
 import { getOverview } from '../services/api'
 
@@ -36,7 +37,7 @@ export default function MainDashboard(){
       </section>
 
       {loading && <Card title='Loading' subtitle='Fetching overview data…'>Please wait.</Card>}
-      {error && <Card title='Error' subtitle='Could not load overview'>{error}</Card>}
+      {error && <ErrorBanner message={error} />}
 
       <div className='dashboard-grid dashboard-grid-3 dashboard-fade-in'>
         <Card title='System health' subtitle='Live snapshot' >
