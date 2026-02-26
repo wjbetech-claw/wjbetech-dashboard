@@ -63,6 +63,7 @@
   border-radius: 50%;
   background: radial-gradient(circle, rgba(99,102,241,0.18), transparent 60%);
 }
+.dashboard-quick-action { will-change: transform; }
 .dashboard-fade-in {
   animation: fadeInUp 450ms ease;
 }
