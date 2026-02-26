@@ -37,10 +37,16 @@ export default function ReposPage(){
               <TR><TD colSpan={4}><EmptyState title='No repositories' message='No repo data yet.' /></TD></TR>
             ) : filtered.map((repo) => (
               <TR key={repo.id}>
-                <TD><strong>{repo.name}</strong></TD>
+                <TD>
+                  {repo.url ? (
+                    <a href={repo.url} target='_blank' rel='noreferrer'><strong>{repo.name}</strong></a>
+                  ) : (
+                    <strong>{repo.name}</strong>
+                  )}
+                </TD>
                 <TD>
                   <Badge variant={repo.status === 'green' ? 'success' : repo.status === 'yellow' ? 'warning' : repo.status === 'red' ? 'danger' : 'outline'}>
-                    {repo.status || 'unknown'}
+                    {repo.status === 'green' ? '🟢' : repo.status === 'yellow' ? '🟡' : repo.status === 'red' ? '🔴' : '⚪'} {repo.status || 'unknown'}
                   </Badge>
                 </TD>
                 <TD>{repo.openPRs ?? 0}</TD>
