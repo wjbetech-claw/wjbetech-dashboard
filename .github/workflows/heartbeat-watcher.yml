@@ -4,41 +4,55 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '**/HEARTBEAT.md'
+      - "HEARTBEAT.md"
+
+permissions:
+  contents: read
 
 jobs:
   notify:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Find HEARTBEAT.md
-        id: hbpath
-        run: |
-          HB_PATH="$(git ls-files '**/HEARTBEAT.md' | head -n 1)"
-          if [ -z "$HB_PATH" ]; then
-            echo "No HEARTBEAT.md found in repo. Exiting." >&2
-            exit 1
-          fi
-          echo "path=$HB_PATH" >> "$GITHUB_OUTPUT"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Extract last heartbeat entry
         id: heartbeat
+        shell: bash
         run: |
-          LAST_LINE="$(tail -n 1 '${{ steps.hbpath.outputs.path }}')"
+          set -euo pipefail
+
+          if [ ! -f HEARTBEAT.md ]; then
+            echo "HEARTBEAT.md not found" >&2
+            exit 1
+          fi
+
+          # last non-empty line (tail -n 1 returns empty if file ends with blank line)
+          LAST_LINE="$(grep -v '^[[:space:]]*$' HEARTBEAT.md | tail -n 1 || true)"
+
+          if [ -z "${LAST_LINE:-}" ]; then
+            echo "HEARTBEAT.md has no non-empty lines" >&2
+            exit 1
+          fi
+
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
       - name: Send Discord notification
         if: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        shell: bash
         run: |
-          curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+          set -euo pipefail
+
+          payload=$(printf '{"content":"🛠 OpenClaw Update:\\n`%s`"}' "${{ steps.heartbeat.outputs.last_line }}")
+
+          curl -fsS -X POST \
+            -H "Content-Type: application/json" \
+            -d "$payload" \
             "$DISCORD_WEBHOOK_URL"
 
       - name: Skip notification (no webhook configured)
         if: ${{ secrets.DISCORD_WEBHOOK_URL == '' }}
-        run: |
-          echo "DISCORD_WEBHOOK_URL not configured; skipping notification." 
+        run: echo "DISCORD_WEBHOOK_URL not configured; skipping notification."
