@@ -9,23 +9,18 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
       - uses: actions/checkout@v4
-
-      - name: Find HEARTBEAT.md
-        id: hbpath
-        run: |
-          HB_PATH="$(git ls-files '**/HEARTBEAT.md' | head -n 1)"
-          if [ -z "$HB_PATH" ]; then
-            echo "No HEARTBEAT.md found in repo. Exiting." >&2
-            exit 1
-          fi
-          echo "path=$HB_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Get last heartbeat line
         id: heartbeat
         run: |
-          LAST_LINE="$(tail -n 1 '${{ steps.hbpath.outputs.path }}')"
-          echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
+          if [ ! -f HEARTBEAT.md ]; then
+          echo "HEARTBEAT.md not found" >&2
+          exit 1
+        fi
+        LAST_LINE="$(tail -n 1 HEARTBEAT.md)"
+        echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
       - name: Send Discord ping
         env:
