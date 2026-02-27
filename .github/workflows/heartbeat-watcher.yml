@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'HEARTBEAT.md'
+      - "HEARTBEAT.md"
 
 permissions:
   contents: read
@@ -14,28 +14,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Extract last heartbeat entry
         id: heartbeat
+        shell: bash
         run: |
+          set -euo pipefail
+
           if [ ! -f HEARTBEAT.md ]; then
-            echo "HEARTBEAT.md not found"
+            echo "HEARTBEAT.md not found" >&2
             exit 1
           fi
-          LAST_LINE="$(tail -n 1 HEARTBEAT.md)"
+
+          # last non-empty line (tail -n 1 returns empty if file ends with blank line)
+          LAST_LINE="$(grep -v '^[[:space:]]*$' HEARTBEAT.md | tail -n 1 || true)"
+
+          if [ -z "${LAST_LINE:-}" ]; then
+            echo "HEARTBEAT.md has no non-empty lines" >&2
+            exit 1
+          fi
+
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
       - name: Send Discord notification
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WATCHER_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        shell: bash
         run: |
-          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "DISCORD_WATCHER_URL missing"
+          set -euo pipefail
+
+          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
+            echo "DISCORD_WEBHOOK_URL secret missing" >&2
             exit 1
           fi
 
-          curl -X POST \
+          payload=$(printf '{"content":"🛠 OpenClaw Update:\\n`%s`"}' "${{ steps.heartbeat.outputs.last_line }}")
+
+          curl -fsS -X POST \
             -H "Content-Type: application/json" \
-            -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+            -d "$payload" \
             "$DISCORD_WEBHOOK_URL"
