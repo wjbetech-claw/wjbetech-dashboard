@@ -5,19 +5,21 @@ on:
   schedule:
     - cron: '*/3 * * * *'
 
+permissions:
+  contents: read
+
 jobs:
   ping:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Get last heartbeat line
         id: heartbeat
         run: |
           if [ ! -f HEARTBEAT.md ]; then
-            echo "HEARTBEAT.md not found" >&2
+            echo "HEARTBEAT.md not found"
             exit 1
           fi
           LAST_LINE="$(tail -n 1 HEARTBEAT.md)"
@@ -28,11 +30,11 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WATCHER_URL }}
         run: |
           if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "DISCORD_WATCHER_URL secret missing!" >&2
+            echo "DISCORD_WATCHER_URL missing"
             exit 1
           fi
 
-          curl -H "Content-Type: application/json" \
-            -X POST \
+          curl -X POST \
+            -H "Content-Type: application/json" \
             -d "{\"content\":\"⏳ OpenClaw heartbeat ping.\nLast activity:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
             "$DISCORD_WEBHOOK_URL"
