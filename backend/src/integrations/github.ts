@@ -1,29 +1,26 @@
-import { Octokit } from '@octokit/rest'
+import { Octokit } from 'octokit'
+import dotenv from 'dotenv'
 
-export function createOctokit() {
-  const token = process.env.GITHUB_TOKEN
-  if (!token) throw new Error('GITHUB_TOKEN missing')
+dotenv.config()
+
+const token = process.env.GITHUB_TOKEN
+
+function getOctokit(){
+  if(!token) throw new Error('GITHUB_TOKEN not set')
   return new Octokit({ auth: token })
 }
 
-export async function listReposByOrgs(orgNames: string[]) {
-  const octokit = createOctokit()
-  const repos = [] as any[]
-  for (const org of orgNames) {
-    const res = await octokit.repos.listForOrg({ org, per_page: 100 })
-    repos.push(...res.data)
+export async function listOrgRepos(org: string){
+  const octo = getOctokit()
+  const repos: any[] = []
+  for await (const response of octo.paginate.iterator(octo.rest.repos.listForOrg, { org })){
+    repos.push(...response.data)
   }
   return repos
 }
 
-export async function listPullRequests(owner: string, repo: string) {
-  const octokit = createOctokit()
-  const res = await octokit.pulls.list({ owner, repo, state: 'open', per_page: 100 })
-  return res.data
-}
-
-export async function listWorkflowRuns(owner: string, repo: string, branch?: string) {
-  const octokit = createOctokit()
-  const res = await octokit.actions.listWorkflowRunsForRepo({ owner, repo, branch, per_page: 100 })
-  return res.data.workflow_runs
+export async function listRepoPulls(owner: string, repo: string){
+  const octo = getOctokit()
+  const pulls = await octo.rest.pulls.list({ owner, repo })
+  return pulls.data
 }
