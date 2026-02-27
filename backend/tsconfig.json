@@ -1,13 +1,25 @@
 {
   "compilerOptions": {
+<<<<<<< HEAD
+    "target": "ES2020",
+    "module": "CommonJS",
+=======
     "target": "ES2022",
     "module": "ES2022",
     "moduleResolution": "bundler",
+>>>>>>> origin/main
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
+<<<<<<< HEAD
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+=======
     "skipLibCheck": true
   },
   "include": ["src"]
+>>>>>>> origin/main
 }
