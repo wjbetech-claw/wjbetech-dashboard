@@ -29,14 +29,16 @@ jobs:
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
       - name: Send Discord notification
+        if: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "Missing DISCORD_WEBHOOK_URL secret" >&2
-            exit 1
-          fi
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d "{\"content\":\"🛠 OpenClaw Update:\\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+            -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
             "$DISCORD_WEBHOOK_URL"
+
+      - name: Skip notification (no webhook configured)
+        if: ${{ secrets.DISCORD_WEBHOOK_URL == '' }}
+        run: |
+          echo "DISCORD_WEBHOOK_URL not configured; skipping notification." 
