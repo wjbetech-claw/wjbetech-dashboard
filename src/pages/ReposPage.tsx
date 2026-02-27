@@ -20,7 +20,9 @@ export default function ReposPage(){
       <Card title='Repositories' subtitle='Workflow health & PR activity'>
         <div style={{display:'flex',gap:8,marginBottom:12}} role="group" aria-label="Repo status filter">
           {['all','green','yellow','red'].map((f) => (
-            <button key={f} aria-pressed={f===filter} className='cursor-pointer' onClick={()=>setFilter(f)} style={{padding:'4px 10px',border:'1px solid var(--border)',borderRadius:999,background: f===filter ? 'var(--panel)' : 'transparent'}}>{f}</button>
+            <button key={f} aria-pressed={f===filter} className='cursor-pointer' onClick={()=>setFilter(f)} style={{padding:'4px 10px',border:'1px solid var(--border)',borderRadius:999,background: f===filter ? 'var(--panel)' : 'transparent'}}>
+              {f} ({f === 'all' ? repos.length : repos.filter(r => r.status === f).length})
+            </button>
           ))}
         </div>
         <Table>
@@ -30,21 +32,29 @@ export default function ReposPage(){
               <TH>Status</TH>
               <TH>Open PRs</TH>
               <TH>Workflows</TH>
+              <TH>Updated</TH>
             </TR>
           </THead>
           <TBody>
             {filtered.length === 0 ? (
-              <TR><TD colSpan={4}><EmptyState title='No repositories' message='No repo data yet.' /></TD></TR>
+              <TR><TD colSpan={5}><EmptyState title='No repositories' message='No repo data yet.' /></TD></TR>
             ) : filtered.map((repo) => (
               <TR key={repo.id}>
-                <TD><strong>{repo.name}</strong></TD>
+                <TD>
+                  {repo.url ? (
+                    <a href={repo.url} target='_blank' rel='noreferrer'><strong>{repo.name}</strong></a>
+                  ) : (
+                    <strong>{repo.name}</strong>
+                  )}
+                </TD>
                 <TD>
                   <Badge variant={repo.status === 'green' ? 'success' : repo.status === 'yellow' ? 'warning' : repo.status === 'red' ? 'danger' : 'outline'}>
-                    {repo.status || 'unknown'}
+                    {repo.status === 'green' ? '🟢' : repo.status === 'yellow' ? '🟡' : repo.status === 'red' ? '🔴' : '⚪'} {repo.status || 'unknown'}
                   </Badge>
                 </TD>
                 <TD>{repo.openPRs ?? 0}</TD>
                 <TD>{repo.workflows ?? 0}</TD>
+                <TD>{repo.updatedAt || '—'}</TD>
               </TR>
             ))}
           </TBody>
