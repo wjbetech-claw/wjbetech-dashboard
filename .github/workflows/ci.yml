@@ -28,7 +28,7 @@ jobs:
         if: ${{ exists('backend/package.json') }}
         run: |
           cd backend
-          npm ci
+          npm install --prefer-offline --no-audit --no-fund
           npm run lint --if-present
 
   typecheck:
