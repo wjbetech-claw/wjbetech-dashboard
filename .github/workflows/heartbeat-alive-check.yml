@@ -1,13 +1,12 @@
-name: Heartbeat Watcher
+name: Heartbeat Alive Check
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '**/HEARTBEAT.md'
+  schedule:
+    - cron: '*/3 * * * *'
 
 jobs:
-  notify:
+  ping:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,13 +21,13 @@ jobs:
           fi
           echo "path=$HB_PATH" >> "$GITHUB_OUTPUT"
 
-      - name: Extract last heartbeat entry
+      - name: Get last heartbeat line
         id: heartbeat
         run: |
           LAST_LINE="$(tail -n 1 '${{ steps.hbpath.outputs.path }}')"
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
-      - name: Send Discord notification
+      - name: Send Discord ping
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
@@ -38,5 +37,5 @@ jobs:
           fi
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d "{\"content\":\"🛠 OpenClaw Update:\\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+            -d "{\"content\":\"⏳ OpenClaw heartbeat ping.\\nLast activity:\\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
             "$DISCORD_WEBHOOK_URL"
