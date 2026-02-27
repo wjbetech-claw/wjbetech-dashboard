@@ -1,37 +1,99 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from '../ui/card'
+import { Badge } from '../ui/badge'
 
-const integrations = [
-  { name: 'GitHub', status: 'Connected', detail: 'wjbetech-claw' },
-  { name: 'Vercel', status: 'Needs auth', detail: 'Deploy status' },
-  { name: 'Jira', status: 'Optional', detail: 'Import boards' },
-]
+const STORAGE_KEY = 'wjb_settings_v1'
+
+type SettingsState = {
+  theme: 'light' | 'dark'
+  notifications: {
+    email: boolean
+    slack: boolean
+    inApp: boolean
+  }
+}
 
 export default function SettingsPage(){
+  const [settings, setSettings] = useState<SettingsState>({
+    theme: 'dark',
+    notifications: { email: true, slack: false, inApp: true },
+  })
+
+  useEffect(() => {
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if(raw) setSettings(JSON.parse(raw))
+    }catch(e){}
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+    document.documentElement.setAttribute('data-theme', settings.theme)
+  }, [settings])
+
   return (
     <div style={{display:'flex',flexDirection:'column',gap:16}}>
       <Card title='Settings' subtitle='Manage integrations & preferences'>
         <div style={{display:'flex',flexDirection:'column',gap:12}}>
-          {integrations.map((item) => (
-            <div key={item.name} style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
-              <div>
-                <div style={{fontWeight:600}}>{item.name}</div>
-                <div style={{fontSize:12,opacity:0.7}}>{item.detail}</div>
-              </div>
-              <span style={{fontSize:12,padding:'4px 8px',borderRadius:999,border:'1px solid var(--border)'}}>{item.status}</span>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+            <div>
+              <div style={{fontWeight:600}}>Sync status</div>
+              <div style={{fontSize:12,opacity:0.7}}>Last sync: just now</div>
             </div>
-          ))}
+            <button className='cursor-pointer' style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Sync now</button>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+            <div>
+              <div style={{fontWeight:600}}>Theme</div>
+              <div style={{fontSize:12,opacity:0.7}}>Light / dark mode</div>
+            </div>
+            <label style={{fontSize:12,opacity:0.7,marginRight:8}} htmlFor="theme-select">Theme</label>
+            <select
+              id="theme-select"
+              value={settings.theme}
+              onChange={(e)=>setSettings(s=>({...s, theme: e.target.value as 'light'|'dark'}))}
+              style={{padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}
+            >
+              <option value='dark'>Dark</option>
+              <option value='light'>Light</option>
+            </select>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+            <div>
+              <div style={{fontWeight:600}}>GitHub</div>
+              <div style={{fontSize:12,opacity:0.7}}>wjbetech-claw</div>
+              <a href='https://github.com/settings/apps' target='_blank' rel='noreferrer' style={{fontSize:12}}>Manage connection</a>
+            </div>
+            <Badge variant='success'>Connected</Badge>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+            <div>
+              <div style={{fontWeight:600}}>Vercel</div>
+              <div style={{fontSize:12,opacity:0.7}}>Deploy status</div>
+              <a href='https://vercel.com/account/tokens' target='_blank' rel='noreferrer' style={{fontSize:12}}>Connect Vercel</a>
+            </div>
+            <Badge variant='warning'>Needs auth</Badge>
+          </div>
         </div>
       </Card>
 
       <Card title='Notifications' subtitle='How you receive updates'>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
-          {['Email summaries', 'Slack alerts', 'In-app pings'].map((item) => (
-            <div key={item} style={{border:'1px solid var(--border)',borderRadius:10,padding:12}}>
-              <div style={{fontWeight:600}}>{item}</div>
-              <div style={{fontSize:12,opacity:0.7,marginTop:6}}>Weekly digest enabled</div>
-              <button className='cursor-pointer' style={{marginTop:10,padding:'6px 10px',border:'1px solid var(--border)',borderRadius:8,background:'transparent'}}>Configure</button>
-            </div>
+        <div style={{display:'flex',flexDirection:'column',gap:12}}>
+          <div style={{fontSize:12,opacity:0.7}}>Need help? See <a href='https://docs.openclaw.ai' target='_blank' rel='noreferrer'>docs</a>.</div>
+          {([
+            ['email','Email summaries'],
+            ['slack','Slack alerts'],
+            ['inApp','In‑app pings'],
+          ] as const).map(([key, label]) => (
+            <label key={key} style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:8}}>
+              <span>{label}</span>
+              <input
+                type='checkbox'
+                aria-label={label}
+                checked={settings.notifications[key]}
+                onChange={(e)=>setSettings(s=>({...s, notifications: {...s.notifications, [key]: e.target.checked}}))}
+              />
+            </label>
           ))}
         </div>
       </Card>

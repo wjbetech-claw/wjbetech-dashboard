@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Card from '../ui/card'
 
 const envs = [
@@ -7,7 +7,7 @@ const envs = [
   { name: 'QA', nodes: 4, uptime: '98.6%', region: 'eu-central-1' },
 ]
 
-export default function EnvironmentsGrid(){
+function EnvironmentsGrid(){
   return (
     <Card title='Environments' subtitle='Health and footprint by cluster'>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
@@ -23,3 +23,6 @@ export default function EnvironmentsGrid(){
     </Card>
   )
 }
+
+
+export default memo(EnvironmentsGrid)

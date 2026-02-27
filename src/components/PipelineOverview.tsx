@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Card from '../ui/card'
 
 const pipelines = [
@@ -7,7 +7,7 @@ const pipelines = [
   { name: 'edge-gateway', env: 'prod', status: 'success', progress: 100 },
 ]
 
-export default function PipelineOverview(){
+function PipelineOverview(){
   return (
     <Card title='Pipeline overview' subtitle='Status across primary services'>
       <div style={{display:'flex',flexDirection:'column',gap:12}}>
@@ -27,3 +27,6 @@ export default function PipelineOverview(){
     </Card>
   )
 }
+
+
+export default memo(PipelineOverview)

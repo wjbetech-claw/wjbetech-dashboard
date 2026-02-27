@@ -3,24 +3,25 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  KeyboardSensor,
   useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-type Card = { id: string; title: string; description?: string }
+type Card = { id: string; title: string; description?: string; tags?: string[]; assignees?: string[]; updatedAt?: string }
 
 type Column = { id: string; title: string; cards: Card[]; color: string; icon: string }
 
 const STORAGE_KEY = 'wjb_kanban_v4'
 
 const DEFAULT_COLS: Column[] = [
-  {id:'todo', title:'Backlog', color:'#EEF2FF', icon:'🧠', cards:[{id:'c1',title:'Design dashboard polish',description:'Refine spacing + cards'}]},
-  {id:'doing', title:'In Progress', color:'#ECFEFF', icon:'⚙️', cards:[{id:'c2',title:'CI workflow tweaks',description:'Ensure tests are green'}]},
+  {id:'todo', title:'Backlog', color:'#EEF2FF', icon:'🧠', cards:[{id:'c1',title:'Design dashboard polish',description:'Refine spacing + cards', tags:['UI','Design'], assignees:['Ari'], updatedAt:'Just now'}]} ,
+  {id:'doing', title:'In Progress', color:'#ECFEFF', icon:'⚙️', cards:[{id:'c2',title:'CI workflow tweaks',description:'Ensure tests are green', tags:['CI'], assignees:['Devon'], updatedAt:'2h ago'}]} ,
   {id:'review', title:'Review', color:'#FFF7ED', icon:'🔍', cards:[]},
-  {id:'done', title:'Done', color:'#ECFDF5', icon:'✅', cards:[{id:'c3',title:'Navbar links',description:'Board/Jobs links'}]},
+  {id:'done', title:'Done', color:'#ECFDF5', icon:'✅', cards:[{id:'c3',title:'Navbar links',description:'Board/Jobs links', tags:['UI'], assignees:['Mina'], updatedAt:'Yesterday'}]} ,
 ]
 
 function KanbanCard({ card, isDragging, onDelete }: { card: Card; isDragging?: boolean; onDelete?: () => void }){
@@ -41,6 +42,17 @@ function KanbanCard({ card, isDragging, onDelete }: { card: Card; isDragging?: b
         <button className='cursor-pointer' onClick={onDelete} style={{border:'1px solid var(--border)',borderRadius:8,background:'transparent',padding:'2px 6px',fontSize:12}}>🗑️</button>
       </div>
       {card.description ? <div style={{fontSize:12,opacity:0.7,marginTop:4}}>{card.description}</div> : null}
+      {card.tags ? (
+        <div style={{display:'flex',gap:6,flexWrap:'wrap',marginTop:6}}>{card.tags.map(t => (
+          <span key={t} style={{fontSize:11,padding:'2px 6px',border:'1px solid var(--border)',borderRadius:999}}>{t}</span>
+        ))}</div>
+      ) : null}
+      {card.assignees ? (
+        <div style={{display:'flex',gap:6,flexWrap:'wrap',marginTop:6}}>{card.assignees.map(a => (
+          <span key={a} style={{fontSize:11,padding:'2px 6px',border:'1px solid var(--border)',borderRadius:999,background:'var(--panel)'}}>{a}</span>
+        ))}</div>
+      ) : null}
+      {card.updatedAt ? <div style={{fontSize:11,opacity:0.6,marginTop:6}}>Updated {card.updatedAt}</div> : null}
     </div>
   )
 }
@@ -58,17 +70,33 @@ export default function Kanban(){
   const [draftTitle,setDraftTitle] = useState('')
   const [draftDesc,setDraftDesc] = useState('')
   const [draftCol,setDraftCol] = useState(cols[0]?.id || 'todo')
+  const inputRef = React.useRef<HTMLInputElement | null>(null)
 
   const [activeCard, setActiveCard] = useState<Card | null>(null)
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
 
   useEffect(() => {
     if(!isOpen) return
     function onKey(e: KeyboardEvent){
       if(e.key === 'Escape') setIsOpen(false)
+      if(e.key === 'Tab'){
+        const focusables = Array.from(document.querySelectorAll<HTMLElement>("[data-modal='kanban'] button, [data-modal='kanban'] input, [data-modal='kanban'] select, [data-modal='kanban'] textarea"))
+        if(focusables.length === 0) return
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        if(e.shiftKey && document.activeElement === first){
+          e.preventDefault(); last.focus()
+        } else if(!e.shiftKey && document.activeElement === last){
+          e.preventDefault(); first.focus()
+        }
+      }
     }
     window.addEventListener('keydown', onKey)
+    inputRef.current?.focus()
     return () => window.removeEventListener('keydown', onKey)
   }, [isOpen])
 
@@ -156,7 +184,7 @@ export default function Kanban(){
     <div>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
         <div style={{fontWeight:700,display:'flex',alignItems:'center',gap:8}}>🗂️ Kanban board</div>
-        <button className='cursor-pointer' onClick={()=>setIsOpen(true)} style={{padding:'8px 12px',border:'1px solid var(--border)',borderRadius:10,background:'var(--panel)'}}>+ Add task</button>
+        <button className='cursor-pointer' aria-label='Add task' onClick={()=>setIsOpen(true)} style={{padding:'8px 12px',border:'1px solid var(--border)',borderRadius:10,background:'var(--panel)'}}>+ Add task</button>
       </div>
 
       <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
@@ -165,7 +193,9 @@ export default function Kanban(){
             <KanbanColumn key={col.id} col={col}>
               <SortableContext items={col.cards.map(c=>c.id)} strategy={verticalListSortingStrategy}>
                 <div style={{display:'flex',flexDirection:'column',gap:10,minHeight:80}}>
-                  {col.cards.map(card=> (
+                  {col.cards.length === 0 ? (
+                    <div style={{fontSize:12,opacity:0.7}}>No tasks yet</div>
+                  ) : col.cards.map(card=> (
                     <SortableCard key={card.id} id={card.id} card={card} colId={col.id} onDelete={deleteCard} />
                   ))}
                 </div>
@@ -180,11 +210,12 @@ export default function Kanban(){
 
       {isOpen ? (
         <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:50}} role="dialog" aria-modal="true" aria-label="Add new task">
-          <div style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:16,padding:20,width:'min(520px,90vw)',boxShadow:'0 20px 40px rgba(15,23,42,0.25)'}}>
+          <div data-modal='kanban' style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:16,padding:20,width:'min(520px,90vw)',boxShadow:'0 20px 40px rgba(15,23,42,0.25)'}}>
             <div style={{fontWeight:700,fontSize:16,marginBottom:6}}>Add new task</div>
             <div style={{fontSize:12,opacity:0.7,marginBottom:12}}>Choose a list and add details.</div>
             <div style={{display:'flex',flexDirection:'column',gap:10}}>
               <input
+                ref={inputRef}
                 value={draftTitle}
                 onChange={(e)=>setDraftTitle(e.target.value)}
                 placeholder='Task title'

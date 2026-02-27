@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "vite",
+    "test": "vitest",
     "build": "vite build",
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -29,7 +32,9 @@
     "vitest": "^4.0.18",
     "@playwright/test": "^1.47.2",
     "@types/node": "^20.14.10",
-    "vitepress": "^1.3.4"
+    "vitepress": "^1.3.4",
+    "axe-core": "^4.9.1",
+    "jest-axe": "^9.0.0"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
