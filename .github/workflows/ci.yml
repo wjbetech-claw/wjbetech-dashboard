@@ -24,6 +24,12 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run lint --if-present
+      - name: Lint backend if present
+        if: ${{ exists('backend/package.json') }}
+        run: |
+          cd backend
+          npm ci
+          npm run lint --if-present
 
   typecheck:
     runs-on: ubuntu-latest
