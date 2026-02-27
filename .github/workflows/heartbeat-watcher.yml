@@ -9,36 +9,24 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Find HEARTBEAT.md
-        id: hbpath
-        run: |
-          HB_PATH="$(git ls-files '**/HEARTBEAT.md' | head -n 1)"
-          if [ -z "$HB_PATH" ]; then
-            echo "No HEARTBEAT.md found in repo. Exiting." >&2
-            exit 1
-          fi
-          echo "path=$HB_PATH" >> "$GITHUB_OUTPUT"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Extract last heartbeat entry
         id: heartbeat
         run: |
-          LAST_LINE="$(tail -n 1 '${{ steps.hbpath.outputs.path }}')"
+          if [ ! -f HEARTBEAT.md ]; then
+            echo "HEARTBEAT.md not found" >&2
+            exit 1
+          fi
+          LAST_LINE="$(tail -n 1 HEARTBEAT.md)"
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
       - name: Send Discord notification
-        if: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
-            "$DISCORD_WEBHOOK_URL"
-
-      - name: Skip notification (no webhook configured)
-        if: ${{ secrets.DISCORD_WEBHOOK_URL == '' }}
-        run: |
-          echo "DISCORD_WEBHOOK_URL not configured; skipping notification." 
+          -X POST \
+          -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
