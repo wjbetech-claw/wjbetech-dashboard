@@ -1,0 +1,31 @@
+{
+  "name": "wjbetech-light",
+  "colors": {
+    "surface": "#FFFFFF",
+    "surface-muted": "#FBF7F7",
+    "surface-elev-1": "#FFFFFF",
+    "surface-elev-2": "#FFF7F6",
+    "text": "#0F1722",
+    "muted": "#6B6B6B",
+    "border": "#E9E3E3",
+    "interactive": "#E96B6B",
+    "interactive-strong": "#D64545",
+    "accent-gold-1": "#FFDDAA",
+    "accent-gold-2": "#FFC260",
+    "success": "#2BAF6F",
+    "warning": "#E6A23C",
+    "danger": "#D64545"
+  },
+  "accents": {
+    "accent-1": "#FFEFEF",
+    "accent-2": "#FFD6D6",
+    "accent-3": "#FFBFBF",
+    "accent-4": "#FF9A9A",
+    "accent-5": "#FF8383",
+    "accent-6": "#E96B6B"
+  },
+  "typography": {
+    "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+    "sizes": { "xs": "12px", "sm": "14px", "base": "16px", "md": "18px", "lg": "20px", "xl": "24px" }
+  }
+}
