@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect } from 'vitest'
+import { vi, describe, it, expect } from 'vitest'
 import { Button } from '../button'
 
 describe('Button', () => {
@@ -13,11 +13,4 @@ describe('Button', () => {
     await userEvent.click(btn)
     expect(handle).toHaveBeenCalled()
   })
-})
-import { render } from '@testing-library/react'
-import { Button } from '../button'
-
-test('renders button', () => {
-  const { getByText } = render(<Button>Click</Button>)
-  expect(getByText('Click')).toBeInTheDocument()
 })
