@@ -1,0 +1,27 @@
+name: Heartbeat Watcher
+
+on:
+  push:
+    paths:
+      - 'HEARTBEAT.md'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Extract last heartbeat entry
+        id: heartbeat
+        run: |
+          LAST_LINE=$(tail -n 1 HEARTBEAT.md)
+          echo "last_line=$LAST_LINE" >> $GITHUB_OUTPUT
+
+      - name: Send Discord notification
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
