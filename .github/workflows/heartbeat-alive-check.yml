@@ -5,37 +5,36 @@ on:
   schedule:
     - cron: '*/3 * * * *'
 
+permissions:
+  contents: read
+
 jobs:
   ping:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Find HEARTBEAT.md
-        id: hbpath
-        run: |
-          HB_PATH="$(git ls-files '**/HEARTBEAT.md' | head -n 1)"
-          if [ -z "$HB_PATH" ]; then
-            echo "No HEARTBEAT.md found in repo. Exiting." >&2
-            exit 1
-          fi
-          echo "path=$HB_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Get last heartbeat line
         id: heartbeat
         run: |
-          LAST_LINE="$(tail -n 1 '${{ steps.hbpath.outputs.path }}')"
+          if [ ! -f HEARTBEAT.md ]; then
+            echo "HEARTBEAT.md not found"
+            exit 1
+          fi
+          LAST_LINE="$(tail -n 1 HEARTBEAT.md)"
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
       - name: Send Discord ping
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WATCHER_URL }}
         run: |
           if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "Missing DISCORD_WEBHOOK_URL secret" >&2
+            echo "DISCORD_WATCHER_URL missing"
             exit 1
           fi
-          curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"content\":\"⏳ OpenClaw heartbeat ping.\\nLast activity:\\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"content\":\"⏳ OpenClaw heartbeat ping.\nLast activity:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
             "$DISCORD_WEBHOOK_URL"
