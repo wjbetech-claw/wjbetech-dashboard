@@ -29,4 +29,4 @@ jobs:
           curl -H "Content-Type: application/json" \
           -X POST \
           -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
-          ${{ secrets.DISCORD_WEBHOOK_URL }}
+          ${{ secrets.DISCORD_WATCHER_URL }}

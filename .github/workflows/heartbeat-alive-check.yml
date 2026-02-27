@@ -31,8 +31,8 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "Missing DISCORD_WEBHOOK_URL secret" >&2
+          if [ -z "$DISCORD_WATCHER_URL" ]; then
+            echo "Missing DISCORD_WATCHER_URL secret" >&2
             exit 1
           fi
           curl -H "Content-Type: application/json" \
