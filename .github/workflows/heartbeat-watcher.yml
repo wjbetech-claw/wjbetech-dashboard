@@ -4,29 +4,38 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '**/HEARTBEAT.md'
+      - 'HEARTBEAT.md'
+
+permissions:
+  contents: read
 
 jobs:
   notify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Extract last heartbeat entry
         id: heartbeat
         run: |
           if [ ! -f HEARTBEAT.md ]; then
-            echo "HEARTBEAT.md not found" >&2
+            echo "HEARTBEAT.md not found"
             exit 1
           fi
           LAST_LINE="$(tail -n 1 HEARTBEAT.md)"
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
 
       - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WATCHER_URL }}
         run: |
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
-          ${{ secrets.DISCORD_WATCHER_URL }}
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "DISCORD_WATCHER_URL missing"
+            exit 1
+          fi
+
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"content\":\"🛠 OpenClaw Update:\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+            "$DISCORD_WEBHOOK_URL"
