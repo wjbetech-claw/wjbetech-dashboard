@@ -1,0 +1,42 @@
+name: Heartbeat Watcher
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**/HEARTBEAT.md'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find HEARTBEAT.md
+        id: hbpath
+        run: |
+          HB_PATH="$(git ls-files '**/HEARTBEAT.md' | head -n 1)"
+          if [ -z "$HB_PATH" ]; then
+            echo "No HEARTBEAT.md found in repo. Exiting." >&2
+            exit 1
+          fi
+          echo "path=$HB_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Extract last heartbeat entry
+        id: heartbeat
+        run: |
+          LAST_LINE="$(tail -n 1 '${{ steps.hbpath.outputs.path }}')"
+          echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
+
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "Missing DISCORD_WEBHOOK_URL secret" >&2
+            exit 1
+          fi
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"content\":\"🛠 OpenClaw Update:\\n\`${{ steps.heartbeat.outputs.last_line }}\`\"}" \
+            "$DISCORD_WEBHOOK_URL"

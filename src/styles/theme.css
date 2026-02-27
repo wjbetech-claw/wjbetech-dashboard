@@ -1,0 +1,41 @@
+/* Generated theme variables — light & dark */
+:root {
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #FBF7F7;
+  --color-surface-elev-1: #FFFFFF;
+  --color-surface-elev-2: #FFF7F6;
+  --color-text: #0F1722;
+  --color-muted: #6B6B6B;
+  --color-border: #E9E3E3;
+  --color-interactive: #E96B6B;
+  --color-interactive-strong: #D64545;
+  --color-accent-1: #FFDDAA;
+  --color-accent-2: #FFC260;
+  --color-success: #2BAF6F;
+  --color-warning: #E6A23C;
+  --color-danger: #D64545;
+}
+
+[data-theme="dark"] {
+  --color-surface: #0B1020;
+  --color-surface-muted: #0F1726;
+  --color-surface-elev-1: #0F1726;
+  --color-surface-elev-2: #172033;
+  --color-text: #E6F0EA;
+  --color-muted: #B7C9BF;
+  --color-border: #172033;
+  --color-interactive: #1F6B4A;
+  --color-interactive-strong: #0F4B3A;
+  --color-accent-1: #1D2B50;
+  --color-accent-2: #2E8B57;
+  --color-success: #55D089;
+  --color-warning: #E8B45B;
+  --color-danger: #E07A7A;
+}
+
+/* Utility helpers */
+.bg-surface { background-color: var(--color-surface); }
+.text-primary { color: var(--color-text); }
+.border-subtle { border-color: var(--color-border); }
+.button-primary { background-color: var(--color-interactive); color: var(--color-surface); }
+
