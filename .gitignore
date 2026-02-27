@@ -1,11 +1,4 @@
 node_modules
 dist
 .env
-.vscode
-
-# automation
-.openclaw/
-
-# OpenClaw scratch
-.openclaw/
-.tmp/
+.env.local
