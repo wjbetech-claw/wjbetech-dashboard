@@ -1,0 +1,23 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import React, { useEffect, useState } from 'react';
+import Card from '../ui/card';
+import { Badge } from '../ui/badge';
+import { getJobs, updateJobStatus } from '../services/api';
+import { EmptyState } from '../ui/empty-state';
+export default function JobsPage() {
+    const [jobs, setJobs] = useState([]);
+    const [filter, setFilter] = useState('all');
+    const openCount = jobs.length;
+    const savedCount = jobs.filter(j => j.status === 'saved').length;
+    const appliedCount = jobs.filter(j => j.status === 'applied').length;
+    useEffect(() => {
+        getJobs().then((data) => setJobs(data.jobs || []));
+    }, []);
+    const filtered = filter === 'all' ? jobs : jobs.filter((j) => j.status === filter);
+    function onAction(id, action) {
+        updateJobStatus(id, action).catch(() => { });
+        setJobs((prev) => prev.map((j) => j.id === id ? { ...j, status: action === 'save' ? 'saved' : 'applied' } : j));
+    }
+    return (_jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: 16 }, children: [_jsx(Card, { title: 'Jobs pipeline', subtitle: 'Track applications and job discovery', children: _jsxs("div", { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }, children: [_jsxs(Card, { title: 'Open roles', subtitle: 'Active listings', children: [_jsx("div", { style: { fontSize: 24, fontWeight: 700 }, children: openCount }), _jsx("div", { style: { fontSize: 12, opacity: 0.7 }, children: "+6 this week" })] }), _jsxs(Card, { title: 'Saved', subtitle: 'Shortlist', children: [_jsx("div", { style: { fontSize: 24, fontWeight: 700 }, children: savedCount }), _jsx("div", { style: { fontSize: 12, opacity: 0.7 }, children: "Review today" })] }), _jsxs(Card, { title: 'Applied', subtitle: 'In progress', children: [_jsx("div", { style: { fontSize: 24, fontWeight: 700 }, children: appliedCount }), _jsx("div", { style: { fontSize: 12, opacity: 0.7 }, children: "2 awaiting reply" })] })] }) }), _jsxs(Card, { title: 'Active applications', subtitle: 'Most recent activity', children: [_jsx("div", { style: { display: 'flex', gap: 8, marginBottom: 12 }, role: "group", "aria-label": "Job status filter", children: ['all', 'discovered', 'saved', 'applied'].map((f) => (_jsxs("button", { "aria-pressed": f === filter, className: 'cursor-pointer', onClick: () => setFilter(f), style: { padding: '4px 10px', border: '1px solid var(--border)', borderRadius: 999, background: f === filter ? 'var(--panel)' : 'transparent' }, children: [f, " (", f === 'all' ? jobs.length : jobs.filter(j => j.status === f).length, ")"] }, f))) }), _jsx("div", { style: { display: 'flex', flexDirection: 'column', gap: 10 }, children: filtered.length === 0 ? (_jsx(EmptyState, { title: 'No jobs found', message: 'Try another filter or check back later.' })) : filtered.map((job) => (_jsxs("div", { style: { display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 8 }, children: [_jsxs("div", { children: [_jsx("div", { style: { fontWeight: 600 }, children: job.title }), _jsx("div", { style: { fontSize: 12, opacity: 0.7 }, children: job.company }), job.location ? _jsx("div", { style: { fontSize: 12, opacity: 0.7 }, children: job.location }) : null, job.url ? (_jsx("a", { href: job.url, target: '_blank', rel: 'noreferrer', style: { fontSize: 12, marginTop: 4, display: 'inline-block' }, children: "View posting" })) : null] }), _jsxs("div", { style: { display: 'flex', gap: 8, alignItems: 'center' }, children: [_jsx(Badge, { variant: job.status === 'saved' ? 'warning' : job.status === 'applied' ? 'success' : 'outline', children: job.status }), _jsx("button", { className: 'cursor-pointer', "aria-label": `Save ${job.title}`, onClick: () => onAction(job.id, 'save'), style: { padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 8, background: 'transparent' }, children: "Save" }), _jsx("button", { className: 'cursor-pointer', "aria-label": `Apply to ${job.title}`, onClick: () => onAction(job.id, 'apply'), style: { padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 8, background: 'transparent' }, children: "Apply" }), _jsx("button", { className: 'cursor-pointer', "aria-label": `Archive ${job.title}`, onClick: () => onAction(job.id, 'archive'), style: { padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 8, background: 'transparent' }, children: "Archive" })] })] }, job.id))) })] })] }));
+}
+//# sourceMappingURL=JobsPage.js.map
