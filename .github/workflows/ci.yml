@@ -25,7 +25,7 @@ jobs:
       - run: npm ci
       - run: npm run lint --if-present
       - name: Lint backend if present
-        if: ${{ exists('backend/package.json') != '' }}
+        if: ${{ hashFiles('backend/package.json') != '' }}
         run: |
           cd backend
           npm ci
