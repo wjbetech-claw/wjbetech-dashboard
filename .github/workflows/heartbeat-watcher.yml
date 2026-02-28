@@ -52,6 +52,9 @@ jobs:
           payload=$(printf '{"content":"🛠 OpenClaw Update:
 `%s`"}' "${{ steps.heartbeat.outputs.last_line }}")
 
-          curl -fsS -X POST             -H "Content-Type: application/json"             -d "$payload"             "$DISCORD_WEBHOOK_URL"
+          curl -fsS -X POST \
+            -H "Content-Type: application/json" \
+            -d "$payload" \
+            "$DISCORD_WEBHOOK_URL"
         if: ${{ secrets.DISCORD_WEBHOOK_URL == '' }}
         run: echo "DISCORD_WEBHOOK_URL not configured; skipping notification."
