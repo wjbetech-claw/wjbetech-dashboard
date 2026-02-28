@@ -1,0 +1,3 @@
+[submodule "apps/wjbetech-dashboard"]
+  path = apps/wjbetech-dashboard
+  url = https://github.com/wjbetech-claw/wjbetech-dashboard
