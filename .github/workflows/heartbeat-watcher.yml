@@ -38,6 +38,9 @@ jobs:
 
           echo "last_line=$LAST_LINE" >> "$GITHUB_OUTPUT"
       - name: Send Discord notification (if configured)
+
+      - name: Send Discord notification
+        if: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         shell: bash
@@ -51,6 +54,7 @@ jobs:
 
           payload=$(printf '{"content":"🛠 OpenClaw Update:
 `%s`"}' "${{ steps.heartbeat.outputs.last_line }}")
+          payload=$(printf '{"content":"🛠 OpenClaw Update:\n`%s`"}' "${{ steps.heartbeat.outputs.last_line }}")
 
           curl -fsS -X POST \
             -H "Content-Type: application/json" \
