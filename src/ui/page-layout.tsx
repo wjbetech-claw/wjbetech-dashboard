@@ -5,12 +5,15 @@ import SkipLink from '../components/SkipLink'
 
 export default function PageLayout({ children }: { children: React.ReactNode }){
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)'}}>
+    <div style={{minHeight:'100vh',background:'var(--color-surface)'}}>
       <SkipLink />
       <Navbar />
-      <div style={{display:'grid',gridTemplateColumns:'260px 1fr',gap:16,padding:16}}>
+      <div className="layout-shell container-max">
+        <aside className="sidebar bg-level-1 border-subtle">
+          
         <Sidebar />
-        <main id='main-content' style={{display:'flex',flexDirection:'column',gap:16}}>
+        </aside>
+        <main id='main-content' className="content" style={{display:'flex',flexDirection:'column',gap:16}}>
           {children}
         </main>
       </div>
