@@ -64,3 +64,8 @@
 .sidebar { width: var(--sidebar-width); }
 .content { padding: var(--content-padding); }
 
+
+/* Motion baseline */
+:root{--motion-duration-short:150ms;--motion-duration-medium:200ms;--motion-duration-long:250ms;--motion-easing-standard:cubic-bezier(.2,.8,.2,1);}
+[data-theme='dark']{--motion-duration-short:150ms;--motion-duration-medium:200ms;--motion-duration-long:250ms;--motion-easing-standard:cubic-bezier(.2,.8,.2,1);}
+.btn-motion{transition:all var(--motion-duration-medium) var(--motion-easing-standard);}
