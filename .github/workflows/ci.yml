@@ -25,14 +25,10 @@ jobs:
       - run: npm ci
       - run: npm run lint --if-present
       - name: Lint backend if present
-        if: ${{ exists('backend/package.json') }}
+        if: ${{ hashFiles('backend/package.json') != '' }}
         run: |
           cd backend
-<<<<<<< HEAD
-          npm install --prefer-offline --no-audit --no-fund
-=======
           npm ci
->>>>>>> origin/main
           npm run lint --if-present
 
   typecheck:
