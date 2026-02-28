@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm ci
+      - run: npm install
       - run: npm run lint --if-present
       - name: Lint backend if present
         if: ${{ hashFiles('backend/package.json') != '' }}
@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm ci
+      - run: npm install
       - run: npm run typecheck --if-present
 
   unit:
@@ -51,7 +51,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm ci
+      - run: npm install
       - run: npm run build --if-present
       - run: npx vitest run
 
@@ -64,6 +64,6 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm ci
+      - run: npm install
       - run: npx playwright install --with-deps
       - run: npx playwright test
