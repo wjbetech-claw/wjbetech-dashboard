@@ -202,6 +202,43 @@ Never ask what to do next if `TODO.md` contains items.
 
 ---
 
+## 🔁 Autonomous Task Loop (Required)
+
+After a PR is opened:
+
+1. Enable auto-merge.
+2. Monitor CI until it is green.
+3. If CI fails:
+   - pull logs
+   - fix
+   - push
+   - repeat until green
+4. Once the PR merges, immediately:
+   - `git checkout main`
+   - `git pull --ff-only`
+   - read `TODO.md`
+   - select the next unchecked item
+   - create a new branch
+   - start the next task
+
+### Mandatory “Start of Task” update (no exceptions)
+When starting a new TODO item, post a message that includes:
+
+- The exact TODO line you are working on
+- The branch name
+- Output of:
+  - `pwd`
+  - `git status --porcelain=v1 --branch`
+
+### Mandatory “Completion” update
+When a task PR is created, post:
+
+- PR link
+- Auto-merge status
+- Latest CI run link or status summary
+
+---
+
 ## 🧪 Proof Requirement
 
 Every task update must include one of:
