@@ -28,7 +28,7 @@ jobs:
         if: ${{ hashFiles('backend/package.json') != '' }}
         run: |
           cd backend
-          npm ci
+          npm install
           npm run lint --if-present
 
   typecheck:
