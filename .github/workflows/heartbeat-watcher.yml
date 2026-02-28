@@ -45,14 +45,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+<<<<<<< HEAD
+
+          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
+            echo "DISCORD_WEBHOOK_URL secret missing" >&2
+            exit 1
+          fi
+=======
+>>>>>>> origin/main
 
           payload=$(printf '{"content":"🛠 OpenClaw Update:\\n`%s`"}' "${{ steps.heartbeat.outputs.last_line }}")
 
           curl -fsS -X POST \
             -H "Content-Type: application/json" \
             -d "$payload" \
+<<<<<<< HEAD
+            "$DISCORD_WEBHOOK_URL"
+=======
             "$DISCORD_WEBHOOK_URL"
 
       - name: Skip notification (no webhook configured)
         if: ${{ secrets.DISCORD_WEBHOOK_URL == '' }}
         run: echo "DISCORD_WEBHOOK_URL not configured; skipping notification."
+>>>>>>> origin/main
