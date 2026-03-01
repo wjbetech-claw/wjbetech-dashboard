@@ -190,6 +190,47 @@ wait_for_ci() {
   done
 }
 
+wait_for_merge() {
+  local pr_url="$1"
+
+  notify "Waiting for PR to merge: $pr_url"
+
+  while true; do
+    local merged
+    merged="$(gh pr view -R "$REPO" "$pr_url" --json merged --jq .merged 2>/dev/null || echo "false")"
+
+    if [[ "$merged" == "true" ]]; then
+      notify "PR merged: $pr_url"
+      return 0
+    fi
+
+    sleep "$CI_POLL_SECONDS"
+  done
+}
+
+mark_todo_done_and_push_main() {
+  local line_no="$1"
+  local task="$2"
+
+  # Update main then edit TODO.md ON MAIN
+  sync_main_hard
+
+  # Flip checkbox
+  sed -i "${line_no}s/\[ \]/[x]/" "$TODO_FILE"
+
+  # Only commit if it actually changed the file
+  if git diff --quiet -- "$TODO_FILE"; then
+    notify "WARN: TODO line $line_no was already marked done (no change)."
+    return 0
+  fi
+
+  git add "$TODO_FILE"
+  git commit -m "chore: mark TODO done (${task})"
+  git push origin main
+
+  notify "Marked TODO done on main (line $line_no): $task"
+}
+
 # ----------------------------
 # MAIN
 # ----------------------------
@@ -260,17 +301,14 @@ main() {
       exit 20
     fi
 
-    notify "CI green for $pr_url. Checking merge status..."
+    notify "CI green for $pr_url. Waiting for merge..."
 
-    # Check whether PR has actually merged
-    merged="$(gh pr view -R "$REPO" "$pr_url" --json merged --jq .merged)"
+    wait_for_merge "$pr_url"
 
-    if [[ "$merged" != "true" ]]; then
-      notify "PR not merged yet (likely review or required checks pending): $pr_url"
-      exit 0
-    fi
+    # After merge, mark the TODO as done on main and continue loop
+    mark_todo_done_and_push_main "$line_no" "$task"
 
-    notify "PR merged successfully: $pr_url"
+    notify "Task complete and TODO updated. Continuing to next task..."
 
     # Loop continues immediately to next TODO item; main sync happens at start of next iteration.
   done
