@@ -114,3 +114,38 @@ EOF_INNER
 
   echo \"\$out\" | grep -q 'BLOCKED:' && exit 1
 "
+
+# --- SYNC CHANGES FROM CONTAINER -> HOST ---
+echo "[RUNNER] syncing changes from container to host..."
+
+# Collect changed + untracked files inside container
+changed_files="$(
+  docker exec -i "$CONTAINER_NAME" sh -lc "
+    set -e
+    cd '$REPO_PATH'
+    (git diff --name-only; git ls-files -o --exclude-standard) | sed '/^\s*$/d' | sort -u
+  "
+)"
+
+if [[ -z "$changed_files" ]]; then
+  echo "[RUNNER] no changed files found inside container to sync"
+  exit 1
+fi
+
+echo "[RUNNER] files to sync:"
+echo "$changed_files" | sed 's/^/  - /'
+
+# Copy each file out of the container into the host repo root
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+
+  # ensure parent dir exists on host
+  mkdir -p "$(dirname "$f")"
+
+  # copy the file from container -> host
+  docker cp "${CONTAINER_NAME}:${REPO_PATH}/${f}" "./${f}"
+done <<< "$changed_files"
+
+echo "[RUNNER] sync complete. Host git status:"
+git status --porcelain=v1 --branch || true
+# ------------------------------------------
