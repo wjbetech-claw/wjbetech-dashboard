@@ -16,8 +16,16 @@ describe('Kanban board', () => {
   })
 
   it('persists state to localStorage (wjb_kanban_v4)', () => {
-    const { unmount } = render(<Kanban />)
-    // Expect initial items to be present and saved under key
+    const { unmount, getByLabelText, getByPlaceholderText } = render(<Kanban />)
+    // trigger creating a new card which will persist to localStorage
+    const addBtn = getByLabelText('Add task')
+    act(()=> addBtn.click())
+    const titleInput = getByPlaceholderText('Task title')
+    const addTaskBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes('Add task')) as HTMLButtonElement
+    // fill and submit
+    fireEvent.change(titleInput, { target: { value: 'persist me' } })
+    act(()=> addTaskBtn.click())
+    // Expect the storage key to now exist
     const raw = localStorage.getItem('wjb_kanban_v4')
     expect(raw).not.toBeNull()
     unmount()
@@ -29,8 +37,7 @@ describe('Kanban board', () => {
     const card = screen.getByText(/Design dashboard polish/i)
     expect(card).toBeInTheDocument()
     // try focusing and simulating key events (arrow keys) to trigger keyboard interactions
-    act(() => { card.focus() })
-    fireEvent.keyDown(card, { key: ' ', code: 'Space' }) // start drag with keyboard
+    act(() => { card.focus(); fireEvent.keyDown(card, { key: ' ', code: 'Space' }) }) // start drag with keyboard
     // no assertions about DOM mutation here — just ensure no errors
   })
 })
