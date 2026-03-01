@@ -23,10 +23,11 @@ docker ps --format '{{.Names}}' | grep -qx "$CONTAINER_NAME" || {
 }
 
 detect_repo_path() {
+  # Prefer reality: your container repo root is /workspace
   local candidates=(
+    "/workspace"
     "/workspace/apps/wjbetech-dashboard"
     "/workspace/wjbetech-dashboard"
-    "/workspace"
   )
 
   for p in "${candidates[@]}"; do
@@ -47,6 +48,7 @@ REPO_PATH="$(detect_repo_path)" || {
 
 echo "[RUNNER] container=$CONTAINER_NAME repo_path=$REPO_PATH"
 
+# Run the agent inside the container, on the CURRENT branch (created by supervisor)
 docker exec -i "$CONTAINER_NAME" sh -lc "
   set -e
   cd '$REPO_PATH'
@@ -61,10 +63,8 @@ docker exec -i "$CONTAINER_NAME" sh -lc "
     exit 1
   fi
 
-  openclaw agent --agent dashboard --message \"
-  ...
-  \" --timeout 3600 --json
-"
+  # Write prompt to a file to avoid nested-quote hell
+  cat > /tmp/openclaw_task.txt <<'EOF'
 You are a non-interactive coding worker operating inside a git repo.
 
 Hard rules:
@@ -80,8 +80,16 @@ Failure criteria:
 - If you cannot proceed, output exactly one line:
   BLOCKED: <reason>
 and exit non-zero.
+EOF
 
-Task:
-$task
-\" --timeout 3600 --json
+  printf '\nTask:\n%s\n' \"${task}\" >> /tmp/openclaw_task.txt
+
+  # Run the agent and capture output so we can detect BLOCKED:
+  out=\$(openclaw agent --agent dashboard --message \"\$(cat /tmp/openclaw_task.txt)\" --timeout 3600 --json 2>&1) || {
+    echo \"\$out\"
+    exit 1
+  }
+
+  echo \"\$out\"
+  echo \"\$out\" | grep -q '^BLOCKED:' && exit 1
 "
