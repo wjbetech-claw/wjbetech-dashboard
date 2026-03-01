@@ -24,7 +24,7 @@ Main must always stay deployable.
 All commands MUST run from:
 
 ```bash
-cd /workspace/apps/wjbetech-dashboard
+cd /workspace/
 ```
 
 Never use host paths such as `/home/will/...`.
@@ -36,7 +36,7 @@ pwd
 git status --porcelain=v1 --branch
 ```
 
-If `pwd` is not `/workspace/apps/wjbetech-dashboard`, STOP and fix it.
+If `pwd` is not `/workspace/`, STOP and fix it.
 
 ---
 
@@ -52,6 +52,7 @@ git remote -v
 Requirements:
 
 - `/workspace` must be in `safe.directory`
+- DO NOT require subdirectories in safe.directory
 - `origin` must be HTTPS with token:
   
   ```
@@ -87,10 +88,9 @@ Branch names must reflect scope.
 ### 3️⃣ Run local checks before committing
 
 ```bash
-npm install
-npm run lint
-npm run typecheck
-npm test
+npm --prefix apps/wjbetech-dashboard install
+npm --prefix apps/wjbetech-dashboard run lint
+npm --prefix apps/wjbetech-dashboard run build
 ```
 
 If any command fails:
