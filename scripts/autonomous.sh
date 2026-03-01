@@ -99,19 +99,13 @@ sanitize_branch_slug() {
 
 run_local_checks() {
   if [[ "$RUN_LOCAL_CHECKS" -ne 1 ]]; then
-    notify "Local checks disabled (RUN_LOCAL_CHECKS=0)."
+    notify "Local checks disabled."
     return 0
   fi
 
-  if [[ -f package-lock.json ]]; then
-    npm ci
-  else
-    npm install
-  fi
-
-  npm run lint
-  npm run typecheck
-  npm test
+  npm --prefix apps/wjbetech-dashboard install
+  npm --prefix apps/wjbetech-dashboard run lint
+  npm --prefix apps/wjbetech-dashboard run build
 }
 
 create_pr() {
@@ -201,27 +195,44 @@ wait_for_merge() {
   done
 }
 
-mark_todo_done_and_push_main() {
+mark_todo_done_via_pr() {
   local line_no="$1"
   local task="$2"
 
-  # Update main then edit TODO.md ON MAIN
   sync_main_hard
 
-  # Flip checkbox
+  local ts branch pr_url
+  ts="$(date +%Y%m%d-%H%M%S)"
+  branch="chore/mark-${ts}"
+
+  git checkout -b "$branch"
+
   sed -i "${line_no}s/\[ \]/[x]/" "$TODO_FILE"
 
-  # Only commit if it actually changed the file
   if git diff --quiet -- "$TODO_FILE"; then
-    notify "WARN: TODO line $line_no was already marked done (no change)."
+    notify "WARN: TODO line $line_no already marked done."
+    git checkout main
+    git branch -D "$branch"
     return 0
   fi
 
   git add "$TODO_FILE"
   git commit -m "chore: mark TODO done (${task})"
-  git push origin main
+  git push -u origin "$branch"
 
-  notify "Marked TODO done on main (line $line_no): $task"
+  pr_url="$(create_pr "$branch" "chore: mark TODO done (${task})" "Auto-marking TODO line $line_no complete.")"
+  notify "TODO PR created: $pr_url"
+
+  enable_auto_merge "$pr_url" || notify "Auto-merge not enabled for TODO PR."
+
+  wait_for_ci "$branch" || {
+    notify "STOPPING: CI failed on TODO PR."
+    exit 21
+  }
+
+  wait_for_merge "$pr_url"
+
+  notify "TODO successfully marked complete via PR."
 }
 
 # ----------------------------
@@ -299,7 +310,7 @@ main() {
     wait_for_merge "$pr_url"
 
     # After merge, mark the TODO as done on main and continue loop
-    mark_todo_done_and_push_main "$line_no" "$task"
+    mark_todo_done_via_pr "$line_no" "$task"
 
     notify "Task complete and TODO updated. Continuing to next task..."
 
