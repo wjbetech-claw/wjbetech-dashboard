@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent, act, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Kanban from '../Kanban'
 
 // Basic smoke tests for Kanban: renders, persists to localStorage, keyboard sensor present
@@ -19,13 +20,13 @@ describe('Kanban board', () => {
     const { unmount } = render(<Kanban />)
     // trigger creating a new card
     const addBtn = await screen.findByLabelText('Add task')
-    act(()=> fireEvent.click(addBtn))
+    await userEvent.click(addBtn)
     const dialog = await screen.findByRole('dialog')
     const titleInput = within(dialog).getByPlaceholderText('Task title')
     const addTaskBtn = within(dialog).getByText('Add task')
     // fill and submit
-    fireEvent.change(titleInput, { target: { value: 'persist me' } })
-    act(()=> fireEvent.click(addTaskBtn))
+    await userEvent.type(titleInput, 'persist me')
+    await userEvent.click(addTaskBtn)
     // Expect the new card to be visible
     expect(await screen.findByText('persist me')).toBeInTheDocument()
     unmount()
