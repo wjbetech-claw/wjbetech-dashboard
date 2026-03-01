@@ -54,11 +54,17 @@ docker exec -i "$CONTAINER_NAME" sh -lc "
   echo '[RUNNER] pwd:' \$(pwd)
   git status --porcelain=v1 --branch || true
 
-  # Keep container copy aligned (if it is a real git checkout)
-  git checkout main
-  git pull --ff-only
+  branch=\$(git rev-parse --abbrev-ref HEAD)
+  echo '[RUNNER] branch:' \$branch
+  if [ \"\$branch\" = \"main\" ]; then
+    echo 'BLOCKED: runner is on main; supervisor should create a task branch first'
+    exit 1
+  fi
 
   openclaw agent --agent dashboard --message \"
+  ...
+  \" --timeout 3600 --json
+"
 You are a non-interactive coding worker operating inside a git repo.
 
 Hard rules:
