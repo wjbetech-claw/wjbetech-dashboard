@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+umask 022
 set -euo pipefail
 
 task="${1:-}"
@@ -31,7 +32,7 @@ detect_repo_path() {
   )
 
   for p in "${candidates[@]}"; do
-    if docker exec -i "$CONTAINER_NAME" sh -lc "[ -d '$p/.git' ]" >/dev/null 2>&1; then
+    if docker exec -i -u node "$CONTAINER_NAME" sh -lc "ls -la /workspace; ls -la /workspace/apps || true" >/dev/null 2>&1; then
       echo "$p"
       return 0
     fi
