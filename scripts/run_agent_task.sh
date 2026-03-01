@@ -10,32 +10,72 @@ fi
 echo "[RUNNER] task: $task"
 
 # --- CONFIG ---
-# Container name that has OpenClaw running (adjust if yours differs)
-CONTAINER_NAME="openclaw-openclaw-gateway-1"
-
-# Repo path INSIDE the container (adjust if your container mounts it somewhere else)
-REPO_PATH="/workspace/apps/wjbetech-dashboard"
+CONTAINER_NAME="${CONTAINER_NAME:-openclaw-openclaw-gateway-1}"
 # --------------
 
-# Sanity checks
-command -v docker >/dev/null || { echo "[RUNNER] docker not found"; exit 1; }
+command -v docker >/dev/null 2>&1 || { echo "[RUNNER] docker not found"; exit 127; }
+
 docker ps --format '{{.Names}}' | grep -qx "$CONTAINER_NAME" || {
-  echo "[RUNNER] container not running: $CONTAINER_NAME"
+  echo "[RUNNER] container not running or not found: $CONTAINER_NAME"
+  echo "[RUNNER] running containers:"
+  docker ps --format '  - {{.Names}}'
   exit 1
 }
 
-# Run ONE task through OpenClaw inside the container.
-# IMPORTANT: This must return non-zero if the agent fails.
+detect_repo_path() {
+  local candidates=(
+    "/workspace/apps/wjbetech-dashboard"
+    "/workspace/wjbetech-dashboard"
+    "/workspace"
+  )
+
+  for p in "${candidates[@]}"; do
+    if docker exec -i "$CONTAINER_NAME" sh -lc "[ -d '$p/.git' ]" >/dev/null 2>&1; then
+      echo "$p"
+      return 0
+    fi
+  done
+  return 1
+}
+
+REPO_PATH="$(detect_repo_path)" || {
+  echo "[RUNNER] Could not find repo inside container."
+  echo "[RUNNER] Debug listing:"
+  docker exec -i "$CONTAINER_NAME" sh -lc "ls -la /workspace; ls -la /workspace/apps || true" || true
+  exit 1
+}
+
+echo "[RUNNER] container=$CONTAINER_NAME repo_path=$REPO_PATH"
+
 docker exec -i "$CONTAINER_NAME" sh -lc "
   set -e
   cd '$REPO_PATH'
-  echo '[RUNNER] pwd:' \$(pwd)
-  git status --porcelain || true
 
-  # Pull latest main so the agent uses newest scripts/config
+  echo '[RUNNER] pwd:' \$(pwd)
+  git status --porcelain=v1 --branch || true
+
+  # Keep container copy aligned (if it is a real git checkout)
   git checkout main
   git pull --ff-only
 
-  # Run one OpenClaw agent turn via the gateway (inside container)
-  openclaw agent --agent dashboard --message "You are acting as an autonomous coding agent working in this git repo. Do NOT ask questions. Implement the task by editing/creating files in the workspace so that 'git status --porcelain' shows changes. After changes are made, output a short summary of what you changed. Task: $task" --timeout 3600 --json
+  openclaw agent --agent dashboard --message \"
+You are a non-interactive coding worker operating inside a git repo.
+
+Hard rules:
+- Do NOT ask questions.
+- Do NOT mention PRs, branches, or next steps.
+- Do NOT request permission.
+- Only edit files to implement the task.
+
+Success criteria:
+- After edits, 'git status --porcelain=v1' must show changes.
+
+Failure criteria:
+- If you cannot proceed, output exactly one line:
+  BLOCKED: <reason>
+and exit non-zero.
+
+Task:
+$task
+\" --timeout 3600 --json
 "
