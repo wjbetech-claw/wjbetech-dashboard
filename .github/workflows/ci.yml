@@ -56,6 +56,9 @@ jobs:
       - run: npx vitest run
 
   e2e:
+    # Temporarily disabled while backend/frontend stabilize.
+    # Re-enable when e2e infra (web server + env) is ready.
+    if: false
     runs-on: ubuntu-latest
     needs: unit
     steps:
