@@ -63,33 +63,54 @@ docker exec -i "$CONTAINER_NAME" sh -lc "
     exit 1
   fi
 
-  # Write prompt to a file to avoid nested-quote hell
-  cat > /tmp/openclaw_task.txt <<'EOF'
-You are a non-interactive coding worker operating inside a git repo.
+  echo '[RUNNER] context: top-level listing'
+  ls -la
 
-Hard rules:
+  echo '[RUNNER] context: TODO.md (first 200 lines)'
+  sed -n '1,200p' TODO.md || true
+
+  echo '[RUNNER] context: backend listing'
+  ls -la backend || true
+
+  echo '[RUNNER] context: src listing'
+  ls -la src || true
+
+  cat > /tmp/openclaw_task.txt <<'EOF_INNER'
+You are a non-interactive coding worker operating inside a git repo. Your only job is to edit files to implement the task.
+
+Absolute rules:
 - Do NOT ask questions.
-- Do NOT mention PRs, branches, or next steps.
 - Do NOT request permission.
-- Only edit files to implement the task.
+- Do NOT talk about PRs/branches/merging.
+- Do NOT output plans or next steps. Only do the work and report what changed.
+- Do NOT stop just because the repo is clean. A clean repo means you must create changes.
 
-Success criteria:
-- After edits, 'git status --porcelain=v1' must show changes.
+Required workflow (must follow in order):
+1) Read the task requirements from TODO.md and/or WORKFLOW_AUTO.md as needed.
+2) Inspect the current repo structure to decide where the change belongs.
+3) Implement the task by creating/modifying files.
+4) When finished, print:
+   - CHANGED_FILES: <one per line>
+   - A 3-8 line summary of what you implemented.
 
-Failure criteria:
-- If you cannot proceed, output exactly one line:
+Hard success criteria:
+- After edits, `git status --porcelain=v1` MUST show changes.
+
+Failure criteria (use only for real blockers):
+- If you cannot proceed due to missing permissions, missing tools, missing directories, or unclear repo structure that prevents implementation,
+  output exactly ONE line:
   BLOCKED: <reason>
-and exit non-zero.
-EOF
+  and exit non-zero.
+EOF_INNER
 
   printf '\nTask:\n%s\n' \"${task}\" >> /tmp/openclaw_task.txt
 
-  # Run the agent and capture output so we can detect BLOCKED:
   out=\$(openclaw agent --agent dashboard --message \"\$(cat /tmp/openclaw_task.txt)\" --timeout 3600 --json 2>&1) || {
     echo \"\$out\"
     exit 1
   }
 
   echo \"\$out\"
+
   echo \"\$out\" | grep -q 'BLOCKED:' && exit 1
 "
