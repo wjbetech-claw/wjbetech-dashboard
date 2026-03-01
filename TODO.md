@@ -7,7 +7,7 @@ Following docs/todo.md — topmost unchecked tasks. OpenClaw will work from the 
 - [x] Task 1.1: Backend Project Setup — scaffold Node/Express backend, TypeScript, health route, env example, dev/build scripts
 
 2026-03-01T13:06:00Z | chore/agent-2026-03-01-backend-project-setup | committed | Task 1.1 completed and scaffold committed
-- [ ] Task 1.2: Database Schema (Postgres) — migration 001_initial_schema.sql, DAOs, pg pool
+- [x] Task 1.2: Database Schema (Postgres) — migration 001_initial_schema.sql, DAOs, pg pool
 - [ ] Task 1.3: GitHub Integration & Sync Worker — Octokit wrapper, cron worker, rate-limit handling
 - [ ] Task 1.4: Core API Endpoints — repos, pulls, workflows, overview, jobs, active-job
 - [ ] Task 1.5: Active Job Auto-Detection Logic — computeActiveJob service
