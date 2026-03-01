@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent, act, within } from '@testing-library/react'
 import Kanban from '../Kanban'
 
 // Basic smoke tests for Kanban: renders, persists to localStorage, keyboard sensor present
@@ -15,13 +15,14 @@ describe('Kanban board', () => {
     expect(screen.getByText(/Done/i)).toBeInTheDocument()
   })
 
-  it('persists state to localStorage (wjb_kanban_v4)', () => {
-    const { unmount, getByLabelText, getByPlaceholderText } = render(<Kanban />)
+  it('persists state to localStorage (wjb_kanban_v4)', async () => {
+    const { unmount } = render(<Kanban />)
     // trigger creating a new card which will persist to localStorage
-    const addBtn = getByLabelText('Add task')
+    const addBtn = screen.getByLabelText('Add task')
     act(()=> addBtn.click())
-    const titleInput = getByPlaceholderText('Task title')
-    const addTaskBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes('Add task')) as HTMLButtonElement
+    const dialog = screen.getByRole('dialog')
+    const titleInput = within(dialog).getByPlaceholderText('Task title')
+    const addTaskBtn = within(dialog).getByText('Add task')
     // fill and submit
     fireEvent.change(titleInput, { target: { value: 'persist me' } })
     act(()=> addTaskBtn.click())
