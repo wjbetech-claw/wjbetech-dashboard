@@ -36,14 +36,6 @@ docker exec -i "$CONTAINER_NAME" sh -lc "
   git checkout main
   git pull --ff-only
 
-  # TODO: REPLACE this with the actual OpenClaw command you use to run a task.
-  # Examples you might end up using:
-  #   openclaw run --task \"$task\"
-  #   node scripts/openclaw.js --task \"$task\"
-  #   ./scripts/openclaw-task.sh \"$task\"
-  #
-  # For now, fail loudly so you don’t think it worked when it didn’t:
-  echo '[RUNNER] ERROR: OpenClaw task command not wired yet.'
-  echo '[RUNNER] Task was: $task'
-  exit 1
+  # Run one OpenClaw agent turn via the gateway (inside container)
+  openclaw agent --agent dashboard --message \"$task\" --timeout 3600 --json
 "
