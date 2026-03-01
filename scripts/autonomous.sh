@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO="wjbetech-claw/wjbetech-dashboard"
 BRANCH_PREFIX="auto"
-TODO_FILE="todo.md"
+TODO_FILE="TODO.md"
 
 notify() {
   # Replace this with your real notification channel (see section 4)
