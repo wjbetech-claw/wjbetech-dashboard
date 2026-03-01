@@ -9,7 +9,7 @@ TODO_FILE="TODO.md"
 
 # MUST be run from the app root (host or container), matching your workflow doc.
 # Host: /home/will/openclaw/apps/wjbetech-dashboard
-# Container: /workspace/apps/wjbetech-dashboard
+# Container: /workspace
 REQUIRED_SUBPATH="/apps/wjbetech-dashboard"
 
 BRANCH_PREFIX="auto"
@@ -33,17 +33,13 @@ fi
 
 notify() {
   local msg="$1"
-
   echo "[NOTIFY] $msg"
 
-  if [[ -z "${GITHUB_DEV_PROGRESS_BOT:-}" ]]; then
-    echo "[WARN] GITHUB_DEV_PROGRESS_BOT not set"
-    return 0
-  fi
+  [[ -n "${GITHUB_DEV_PROGRESS_BOT:-}" ]] || { echo "[WARN] GITHUB_DEV_PROGRESS_BOT not set"; return 0; }
 
   curl -s -H "Content-Type: application/json" \
     -X POST \
-    -d "{\"username\":\"Dev Progress\",\"content\":\"$msg\"}" \
+    -d "$(jq -n --arg username "Dev Progress" --arg content "$msg" '{username:$username, content:$content}')" \
     "$GITHUB_DEV_PROGRESS_BOT" \
     >/dev/null 2>&1 || echo "[WARN] Discord notification failed"
 }
@@ -264,9 +260,17 @@ main() {
       exit 20
     fi
 
-    # At this point, CI is green. Merge might still be pending required reviews etc.
-    # We do NOT mark TODO done until the PR is actually merged.
-    notify "Task complete (CI green). Waiting for merge via auto-merge settings: $pr_url"
+    notify "CI green for $pr_url. Checking merge status..."
+
+    # Check whether PR has actually merged
+    merged="$(gh pr view -R "$REPO" "$pr_url" --json merged --jq .merged)"
+
+    if [[ "$merged" != "true" ]]; then
+      notify "PR not merged yet (likely review or required checks pending): $pr_url"
+      exit 0
+    fi
+
+    notify "PR merged successfully: $pr_url"
 
     # Loop continues immediately to next TODO item; main sync happens at start of next iteration.
   done
