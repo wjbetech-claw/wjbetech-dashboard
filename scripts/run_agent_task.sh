@@ -14,7 +14,7 @@ echo "[RUNNER] task: $task"
 CONTAINER_NAME="openclaw-openclaw-gateway-1"
 
 # Repo path INSIDE the container (adjust if your container mounts it somewhere else)
-REPO_PATH="/workspace/apps/wjbetech-dashboard"
+REPO_PATH="/workspace"
 # --------------
 
 # Sanity checks
