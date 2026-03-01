@@ -106,6 +106,28 @@ EOF_INNER
 
   printf '\nTask:\n%s\n' \"${task}\" >> /tmp/openclaw_task.txt
 
+  # --- PROTECT SUPERVISOR FILES INSIDE CONTAINER ---
+  chmod -w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
+  # --------------------------------------------------
+
+  out=\$(openclaw agent --agent dashboard --message \"\$(cat /tmp/openclaw_task.txt)\" --timeout 3600 --json 2>&1) || {
+    echo \"\$out\"
+
+    # --- RESTORE PERMISSIONS ON FAILURE ---
+    chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
+    # --------------------------------------
+
+    exit 1
+  }
+
+  echo \"\$out\"
+
+  # --- RESTORE PERMISSIONS AFTER SUCCESS ---
+  chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
+  # -----------------------------------------
+
+  echo \"\$out\" | grep -q 'BLOCKED:' && exit 1
+
   out=\$(openclaw agent --agent dashboard --message \"\$(cat /tmp/openclaw_task.txt)\" --timeout 3600 --json 2>&1) || {
     echo \"\$out\"
     exit 1
