@@ -37,5 +37,5 @@ docker exec -i "$CONTAINER_NAME" sh -lc "
   git pull --ff-only
 
   # Run one OpenClaw agent turn via the gateway (inside container)
-  openclaw agent --agent dashboard --message \"$task\" --timeout 3600 --json
+  openclaw agent --agent dashboard --message "You are acting as an autonomous coding agent working in this git repo. Do NOT ask questions. Implement the task by editing/creating files in the workspace so that 'git status --porcelain' shows changes. After changes are made, output a short summary of what you changed. Task: $task" --timeout 3600 --json
 "
