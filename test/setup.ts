@@ -4,6 +4,15 @@ import userEvent from '@testing-library/user-event'
 // expose userEvent globally for tests
 ;(globalThis as any).userEvent = userEvent
 
+// Ensure modal portal root exists for libraries that render into a portal (#modal-root)
+if (typeof document !== 'undefined') {
+  if (!document.getElementById('modal-root')) {
+    const div = document.createElement('div')
+    div.id = 'modal-root'
+    document.body.appendChild(div)
+  }
+}
+
 // Mock fetch for relative URLs to avoid real network calls during tests
 const originalFetch = globalThis.fetch
 globalThis.fetch = async (input: RequestInfo, init?: RequestInit) => {
