@@ -10,7 +10,7 @@ TODO_FILE="TODO.md"
 # MUST be run from the app root (host or container), matching your workflow doc.
 # Host: /home/will/openclaw/apps/wjbetech-dashboard
 # Container: /workspace
-REQUIRED_SUBPATH="/apps/wjbetech-dashboard"
+REQUIRED_SUBPATH="/workspace"
 
 BRANCH_PREFIX="auto"
 
@@ -56,20 +56,13 @@ snapshot() {
 }
 
 require_repo_root() {
-  local p
-  p="$(pwd)"
-  case "$p" in
-    *"$REQUIRED_SUBPATH") ;;
-    *)
-      echo "[FATAL] Wrong working directory."
-      echo "Expected path to include: $REQUIRED_SUBPATH"
-      echo "Actual: $p"
-      exit 2
-      ;;
-  esac
+  git rev-parse --show-toplevel >/dev/null 2>&1 || {
+    echo "[FATAL] Not inside a git repository."
+    exit 2
+  }
 
   [[ -f "$TODO_FILE" ]] || {
-    echo "[FATAL] $TODO_FILE not found in $(pwd). Run from repo root."
+    echo "[FATAL] $TODO_FILE not found in repo root."
     exit 2
   }
 }
