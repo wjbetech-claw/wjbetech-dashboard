@@ -8,9 +8,9 @@ describe('Kanban board', () => {
     localStorage.clear()
   })
 
-  it('renders columns and cards', () => {
+  it('renders columns and cards', async () => {
     render(<Kanban />)
-    expect(screen.getByText(/Backlog/i)).toBeInTheDocument()
+    expect(await screen.findByText(/Backlog/i)).toBeInTheDocument()
     expect(screen.getByText(/In Progress/i)).toBeInTheDocument()
     expect(screen.getByText(/Done/i)).toBeInTheDocument()
   })
@@ -18,14 +18,14 @@ describe('Kanban board', () => {
   it('persists state to localStorage (wjb_kanban_v4)', async () => {
     const { unmount } = render(<Kanban />)
     // trigger creating a new card which will persist to localStorage
-    const addBtn = screen.getByLabelText('Add task')
-    act(()=> addBtn.click())
-    const dialog = screen.getByRole('dialog')
+    const addBtn = await screen.findByLabelText('Add task')
+    act(()=> fireEvent.click(addBtn))
+    const dialog = await screen.findByRole('dialog')
     const titleInput = within(dialog).getByPlaceholderText('Task title')
     const addTaskBtn = within(dialog).getByText('Add task')
     // fill and submit
     fireEvent.change(titleInput, { target: { value: 'persist me' } })
-    act(()=> addTaskBtn.click())
+    act(()=> fireEvent.click(addTaskBtn))
     // Expect the storage key to now exist
     const raw = localStorage.getItem('wjb_kanban_v4')
     expect(raw).not.toBeNull()
