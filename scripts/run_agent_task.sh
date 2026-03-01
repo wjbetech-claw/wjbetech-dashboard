@@ -91,5 +91,5 @@ EOF
   }
 
   echo \"\$out\"
-  echo \"\$out\" | grep -q '^BLOCKED:' && exit 1
+  echo \"\$out\" | grep -q 'BLOCKED:' && exit 1
 "
