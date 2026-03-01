@@ -16,7 +16,8 @@ export async function syncOnce(){
       // list pulls
       const pulls = await listRepoPulls(r.owner.login, r.name)
       for(const p of pulls){
-        await upsertPR({ pr_id: p.id, repo_id: r.id, number: p.number, title: p.title, author: p.user?.login, state: p.state, merged: p.merged, url: p.html_url })
+        // some Octokit response shapes don't include `merged` on list responses; coerce safely
+        await upsertPR({ pr_id: p.id, repo_id: r.id, number: p.number, title: p.title, author: p.user?.login, state: p.state, merged: (p as any).merged ?? false, url: p.html_url })
       }
     }
   }catch(err){

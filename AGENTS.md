@@ -1,6 +1,12 @@
-# AGENTS.md - Your Workspace
+## Workspace Path (critical)
 
-This folder is home. Treat it that way.
+You are running inside a container. The repository root is:
+
+- /workspace
+
+Do NOT use /workspace/apps/wjbetech-dashboard.
+Do NOT create an apps/ directory.
+All paths must be relative to /workspace.
 
 ## First Run
 
