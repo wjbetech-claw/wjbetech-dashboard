@@ -1,7 +1,9 @@
-import { Router } from 'express'
+import express from 'express'
+import jobsController from '../controllers/jobsController'
 
-export const jobsRouter = Router()
+const router = express.Router()
+router.get('/', jobsController.listJobs)
+router.post('/', jobsController.createJob)
+router.patch('/:id', jobsController.updateJob)
 
-jobsRouter.get('/', (_req, res) => {
-  res.json({ jobs: [{ id: 'j1', title: 'Platform Engineer', company: 'Nimbus', status: 'saved' }] })
-})
+export default router
