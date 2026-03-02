@@ -11,7 +11,6 @@
     "lint": "echo 'eslint not configured - skip'",
     "test": "echo \"No tests configured\" && exit 0"
   },
-
   "engines": {
     "node": ">=18"
   },
@@ -35,7 +34,8 @@
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
-    "supertest": "6.3.3"
+    "supertest": "6.3.3",
+    "msw": "0.55.1"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
