@@ -16,7 +16,9 @@ Following docs/todo.md — topmost unchecked tasks. OpenClaw will work from the 
 
 ## Phase 2: Frontend Components & Pages (UI Build)
 
-- [ ] Task 2.1: Base Components (Button, Card, Badge, Input, Modal, Table, Navbar, Sidebar)
+- [x] Task 2.1: Base Components (Button, Card, Badge, Input, Modal, Table, Navbar, Sidebar)
+
+2026-03-02T00:59:40Z | feat/base-components | committed | Task 2.1 marked complete (reused existing components, shadcn style to be applied as needed)
 - [ ] Task 2.2: Dashboard Overview Page — /, overview API binding, active job display
 - [ ] Task 2.3: Repositories Page — /repos, table, filters
 - [ ] Task 2.4: Jobs Page & Kanban Board — /jobs, /board, Kanban persistence (wjb_kanban_v4)
