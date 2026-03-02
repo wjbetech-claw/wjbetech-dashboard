@@ -10,7 +10,7 @@ export default function ReposPage(){
   const [loading, setLoading] = useState(true)
 
   useEffect(()=>{
-    fetch('/api/repos')
+    fetch('/api/github/featured')
       .then(r=>r.json())
       .then(d=>{ setRepos(d.repos || []); setLoading(false) })
       .catch(()=>setLoading(false))
@@ -40,9 +40,29 @@ export default function ReposPage(){
                 </Link>
               </div>
             </div>
+            <div style={{marginTop:8,fontSize:13,color:'var(--muted)'}}>
+              <small>
+                <RepoMeta owner={r.full_name.split('/')[0]} repo={r.name} />
+              </small>
+            </div>
           </Card>
         ))}
       </div>
     </div>
   )
+}
+
+function RepoMeta({owner,repo}:{owner:string,repo:string}){
+  const [meta, setMeta] = useState<{prs?:number, jobs?:number} | null>(null)
+  useEffect(()=>{
+    let mounted = true
+    fetch(`/api/github/repos/${owner}/${repo}/activities`)
+      .then(r=>r.json())
+      .then(d=>{ if(mounted) setMeta({ prs: d.prs?.length || 0, jobs: d.jobs?.length || 0 }) })
+      .catch(()=>{})
+    return ()=>{ mounted=false }
+  },[owner,repo])
+
+  if(!meta) return <>Loading...</>
+  return <>{meta.prs} PRs • {meta.jobs} jobs</>
 }
