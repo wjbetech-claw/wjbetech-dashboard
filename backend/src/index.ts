@@ -1,18 +1,16 @@
-import express from 'express'
-import dotenv from 'dotenv'
+import express from 'express';
+import reposRouter from './routes/repos';
 
-dotenv.config()
+const app = express();
+app.use(express.json());
 
-const app = express()
-const port = process.env.PORT || 4000
+app.use('/api/repos', reposRouter);
 
-app.get('/health', (_req, res) => {
-  res.json({status: 'ok', time: new Date().toISOString()})
-})
+app.get('/health', (req, res) => res.json({ ok: true }));
 
-app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Backend listening on ${port}`)
-})
+if (process.env.NODE_ENV !== 'test') {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Server running on ${port}`));
+}
 
-export default app
+export default app;

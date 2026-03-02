@@ -1,7 +1,9 @@
-import { Router } from 'express'
+import express from 'express';
+import reposController from '../controllers/reposController';
 
-export const reposRouter = Router()
+const router = express.Router();
 
-reposRouter.get('/', (_req, res) => {
-  res.json({ repos: [{ id: 'r1', name: 'wjbetech-dashboard', status: 'green', openPRs: 4, workflows: 12 }] })
-})
+router.get('/', reposController.listRepos);
+router.get('/:owner/:repo', reposController.getRepo);
+
+export default router;
