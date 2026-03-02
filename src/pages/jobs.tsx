@@ -18,7 +18,8 @@ export default function JobsPage(){
   },[])
 
   async function createJob(){
-    const payload = { repo_full_name: repo, title }
+    // send a monotonic position from client so new cards appear at top of column
+    const payload = { repo_full_name: repo, title, position: Date.now() }
     try{
       const res = await fetch('/api/jobs',{ method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) })
       if (res.ok){
@@ -59,11 +60,20 @@ export default function JobsPage(){
     const curIdx = order.indexOf(job.status)
     const targetIdx = dir==='left' ? Math.max(0, curIdx-1) : Math.min(order.length-1, curIdx+1)
     const newStatus = order[targetIdx]
-    const updated = { ...job, status: newStatus }
+    // compute a new position for ordering when moving between columns
+    const targetCol = cols[newStatus]
+    // find positions in target column and place at top (max position + 1) for now
+    let newPosition = Date.now()
+    if (targetCol.length>0){
+      // place on top by using max position + 1
+      const maxPos = Math.max(...targetCol.map((t:any)=> t.position || Date.now()))
+      newPosition = maxPos + 1
+    }
+    const updated = { ...job, status: newStatus, position: newPosition }
     setJobs(prevJobs => prevJobs.map(j=> j.id===id ? updated : j))
 
     try{
-      const res = await fetch(`/api/jobs/${id}`,{ method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status: newStatus }) })
+      const res = await fetch(`/api/jobs/${id}`,{ method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status: newStatus, position: newPosition }) })
       if(!res.ok) throw new Error('failed')
     }catch(e){
       // rollback
