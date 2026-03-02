@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { Card } from '../ui/card'
 import { Button } from '../ui/button'
+import Toast from '../ui/toast'
 
 export default function JobsPage(){
   const [jobs, setJobs] = useState<any[]>([])
@@ -112,41 +113,45 @@ export default function JobsPage(){
 
       {loading && <div>Loading…</div>}
 
-      <div style={{display:'flex',gap:12}}>
-        <Card style={{flex:1}}>
-          <h3>To do</h3>
-          <div style={{minHeight:200}}>
-            {cols.todo.map(j=> (
-              <JobCard key={j.id} job={j} onUpdate={updateJob} />
-            ))}
-          </div>
-        </Card>
-        <Card style={{flex:1}}>
-          <h3>In progress</h3>
-          <div style={{minHeight:200}}>
-            {cols.inprogress.map(j=> (
-              <JobCard key={j.id} job={j} onUpdate={updateJob} />
-            ))}
-          </div>
-        </Card>
-        <Card style={{flex:1}}>
-          <h3>Done</h3>
-          <div style={{minHeight:200}}>
-            {cols.done.map(j=> (
-              <JobCard key={j.id} job={j} onUpdate={updateJob} />
-            ))}
-          </div>
-        </Card>
-      </div>
+      <DndContext onDragEnd={handleDragEnd}>
+        <div style={{display:'flex',gap:12}}>
+          <Card style={{flex:1}} id="todo">
+            <h3>To do</h3>
+            <div style={{minHeight:200}}>
+              {cols.todo.map(j=> (
+                <JobCard key={j.id} job={j} onUpdate={updateJob} onMove={moveJob} />
+              ))}
+            </div>
+          </Card>
+          <Card style={{flex:1}} id="inprogress">
+            <h3>In progress</h3>
+            <div style={{minHeight:200}}>
+              {cols.inprogress.map(j=> (
+                <JobCard key={j.id} job={j} onUpdate={updateJob} onMove={moveJob} />
+              ))}
+            </div>
+          </Card>
+          <Card style={{flex:1}} id="done">
+            <h3>Done</h3>
+            <div style={{minHeight:200}}>
+              {cols.done.map(j=> (
+                <JobCard key={j.id} job={j} onUpdate={updateJob} onMove={moveJob} />
+              ))}
+            </div>
+          </Card>
+        </div>
+      </DndContext>
+
+      {toast && <Toast message={toast} />}
     </div>
   )
 }
 
 function JobCard({job, onUpdate, onMove}:{job:any,onUpdate:(id:number,fields:any)=>void,onMove:(id:number,dir:'left'|'right')=>void}){
   return (
-    <div style={{padding:8,marginBottom:8,border:'1px solid var(--border)',borderRadius:6,background:'var(--panel)'}}>
+    <div tabIndex={0} role="article" style={{padding:12,marginBottom:10,border:'1px solid var(--border)',borderRadius:8,background:'var(--panel)',boxShadow:'0 1px 3px rgba(0,0,0,0.04)'}} onKeyDown={e=>{ if(e.key==='ArrowLeft') onMove(job.id,'left'); if(e.key==='ArrowRight') onMove(job.id,'right'); }}>
       <div style={{fontWeight:700}}>{job.title}</div>
-      <div style={{fontSize:12,color:'var(--muted)'}}>{job.repo_full_name}</div>
+      <div style={{fontSize:12,color:'var(--muted)'}}>{job.repo_full_name} <span style={{marginLeft:8,padding:'2px 6px',background:'#eef2ff',color:'#3730a3',borderRadius:999,fontSize:11}}>{job.status}</span></div>
       <div style={{marginTop:8,display:'flex',gap:8}}>
         <Button onClick={()=>onUpdate(job.id,{ status: 'inprogress' })}>Start</Button>
         <Button onClick={()=>onUpdate(job.id,{ status: 'done' })}>Done</Button>
@@ -156,3 +161,4 @@ function JobCard({job, onUpdate, onMove}:{job:any,onUpdate:(id:number,fields:any
     </div>
   )
 }
+
