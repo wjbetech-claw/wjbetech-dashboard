@@ -1,17 +1,18 @@
-export type ActiveJob = {
-  title: string
-  kind: string
-  source: string
-  confidence: number
-  signal: string
+// Active job detection scaffold
+import { Pool } from 'pg';
+
+export function computeActiveJob(rows: any[]) {
+  // Placeholder heuristic: pick the job with the most recent 'updated_at'
+  if (!rows || rows.length === 0) return null;
+  return rows.reduce((best: any, cur: any) => {
+    if (!best) return cur;
+    return new Date(cur.updated_at) > new Date(best.updated_at) ? cur : best;
+  }, null);
 }
 
-export function computeActiveJob(): ActiveJob {
-  // Placeholder logic: pick the highest confidence signal (deterministic order)
-  const candidates: ActiveJob[] = [
-    { title: 'Latest PR activity', kind: 'pr', source: 'github', confidence: 0.9, signal: 'Most recently updated PR' },
-    { title: 'Recent commit', kind: 'commit', source: 'github', confidence: 0.7, signal: 'Most recent commit' },
-    { title: 'Top Kanban card', kind: 'kanban', source: 'local', confidence: 0.8, signal: 'Top priority card' },
-  ]
-  return candidates.sort((a, b) => b.confidence - a.confidence)[0]
+export async function fetchAndCompute(pool: Pool) {
+  const res = await pool.query('SELECT * FROM jobs ORDER BY updated_at DESC LIMIT 10');
+  return computeActiveJob(res.rows);
 }
+
+export default { computeActiveJob, fetchAndCompute };
