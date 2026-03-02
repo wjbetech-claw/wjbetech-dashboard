@@ -1,17 +1,8 @@
-import { Router } from "express";
-import { fetchFeaturedRepos } from "../../services/githubRepoService";
+import { Router } from 'express'
 
-const router = Router();
+const router = Router()
 
-// GET /api/featured/:username
-router.get("/:username", async (req, res) => {
-  try {
-    const { username } = req.params;
-    const repos = await fetchFeaturedRepos(username);
-    res.json(repos);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message || 'failed' });
-  }
-});
+// Stub implementation for local development — returns 501 Not Implemented
+router.use((req, res) => res.status(501).json({ error: 'Not implemented (stub)' }))
 
-export default router;
+export default router
