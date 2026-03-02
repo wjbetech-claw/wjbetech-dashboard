@@ -51,7 +51,9 @@ Following docs/todo.md — topmost unchecked tasks. OpenClaw will work from the 
 - [x] Task 2.4: Jobs Page & Kanban Board — /jobs, /board, Kanban persistence (wjb_kanban_v4)
 
 2026-03-02T12:55:00Z | feat/jobs-position-frontend | committed | Task 2.4 completed and position persistence implemented
-- [ ] Task 2.5: Settings Page — theme toggle, integrations, notifications
+- [x] Task 2.5: Settings Page — theme toggle, integrations, notifications
+
+2026-03-02T13:05:00Z | feat/theme-persistence | committed | Task 2.5 completed (theme persistence implemented)
 
 ## Phase 3: Testing, Accessibility, Refinement
 
