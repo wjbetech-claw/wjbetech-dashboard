@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { Card } from '../ui/card'
 import { Button } from '../ui/button'
 
@@ -45,6 +46,8 @@ export default function JobsPage(){
     done: jobs.filter(j=> j.status==='done')
   }
 
+  const [toast, setToast] = useState<string | null>(null)
+
   async function moveJob(id:number, dir:'left'|'right'){
     // optimistic move
     const prev = jobs
@@ -63,9 +66,37 @@ export default function JobsPage(){
       if(!res.ok) throw new Error('failed')
     }catch(e){
       // rollback
-      setJobs(prev)=>prev.map(j=> j.id===id ? job : j)
+      setJobs(prev=>prev.map(j=> j.id===id ? job : j))
       console.error('move failed',e)
+      setToast('Unable to persist move — changes reverted')
+      setTimeout(()=>setToast(null), 4000)
     }
+
+  function getStatusFromContainerId(containerId: string | null) {
+    if (!containerId) return null
+    return containerId as 'todo' | 'inprogress' | 'done'
+  }
+
+  async function handleDragEnd(event: any){
+    const { active, over } = event
+    if (!over) return
+    const activeId = String(active.id)
+    const overId = String(over.id)
+    const targetStatus = getStatusFromContainerId(overId)
+    if (!targetStatus) return
+    const job = jobs.find(j=> String(j.id) === activeId)
+    if (!job) return
+    if (job.status === targetStatus) return
+    const order = ['todo','inprogress','done']
+    const curIdx = order.indexOf(job.status)
+    const targetIdx = order.indexOf(targetStatus)
+    const dir: 'left'|'right' = targetIdx < curIdx ? 'left' : 'right'
+    try{
+      await moveJob(job.id, dir)
+    }catch(e){
+      // moveJob handles rollback and toast
+    }
+  }
   }
 
   return (
