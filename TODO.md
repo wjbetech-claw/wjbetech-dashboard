@@ -48,7 +48,9 @@ Following docs/todo.md — topmost unchecked tasks. OpenClaw will work from the 
 - [x] Task 2.3: Repositories Page — /repos, table, filters
 
 2026-03-02T01:12:46Z | feat/repos-page | committed | Task 2.3 scaffold added (UI + test scaffold). Backend wiring deferred to Task 1.6.
-- [ ] Task 2.4: Jobs Page & Kanban Board — /jobs, /board, Kanban persistence (wjb_kanban_v4)
+- [x] Task 2.4: Jobs Page & Kanban Board — /jobs, /board, Kanban persistence (wjb_kanban_v4)
+
+2026-03-02T12:55:00Z | feat/jobs-position-frontend | committed | Task 2.4 completed and position persistence implemented
 - [ ] Task 2.5: Settings Page — theme toggle, integrations, notifications
 
 ## Phase 3: Testing, Accessibility, Refinement
