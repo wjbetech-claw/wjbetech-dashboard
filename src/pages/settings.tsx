@@ -1,7 +1,20 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Switch } from '../ui/switch'
 
+const THEME_KEY = 'wjb:theme'
+
 export default function SettingsPage(){
+  const [dark, setDark] = useState<boolean>(() => {
+    try{ const v = localStorage.getItem(THEME_KEY); return v === 'dark' }
+    catch(e){ return false }
+  })
+
+  useEffect(()=>{
+    try{ localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light') }catch(e){}
+    if (dark) document.documentElement.classList.add('theme-dark')
+    else document.documentElement.classList.remove('theme-dark')
+  },[dark])
+
   return (
     <div style={{padding:20}}>
       <h1 style={{fontSize:24}}>Settings</h1>
@@ -10,7 +23,7 @@ export default function SettingsPage(){
       <div style={{marginTop:16}}>
         <label style={{display:'flex',alignItems:'center',gap:8}}>
           <span>Dark theme</span>
-          <Switch defaultChecked={false} />
+          <Switch checked={dark} onCheckedChange={(v:any)=> setDark(!!v)} />
         </label>
       </div>
 
