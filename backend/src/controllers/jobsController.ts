@@ -7,9 +7,11 @@ export async function listJobs(req:Request,res:Response){
 }
 
 export async function createJob(req:Request,res:Response){
-  const { repo_full_name, title, description, status, assignee } = req.body
-  const q = `INSERT INTO jobs (repo_full_name, title, description, status, assignee, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,now(),now()) RETURNING *`
-  const r = await db.query(q, [repo_full_name, title, description, status||'todo', assignee||null])
+  const { repo_full_name, title, description, status, assignee, position } = req.body
+  // Use provided position or a monotonic fallback (ms since epoch)
+  const pos = typeof position !== 'undefined' ? position : Date.now()
+  const q = `INSERT INTO jobs (repo_full_name, title, description, status, assignee, position, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,now(),now()) RETURNING *`
+  const r = await db.query(q, [repo_full_name, title, description, status||'todo', assignee||null, pos])
   res.status(201).json({ job: r.rows[0] })
 }
 
