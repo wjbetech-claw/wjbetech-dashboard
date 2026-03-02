@@ -1,12 +1,13 @@
-import { Router } from 'express'
-import { computeActiveJob } from '../services/activeJob'
+import express from 'express';
+import { Pool } from 'pg';
+import activeJobService from '../services/activeJob';
 
-export const activeJobRouter = Router()
+const router = express.Router();
+const pool = new Pool();
 
-activeJobRouter.get('/', (_req, res) => {
-  res.json(computeActiveJob())
-})
+router.get('/', async (req, res) => {
+  const job = await activeJobService.fetchAndCompute(pool);
+  res.json({ activeJob: job });
+});
 
-activeJobRouter.post('/recompute', (_req, res) => {
-  res.json(computeActiveJob())
-})
+export default router;
