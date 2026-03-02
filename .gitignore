@@ -3,3 +3,6 @@ dist
 .env
 .env.local
 /apps/
+
+# OpenClaw runtime artifacts
+.github/PR_BODIES/
