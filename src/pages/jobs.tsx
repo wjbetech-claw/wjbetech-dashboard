@@ -45,6 +45,29 @@ export default function JobsPage(){
     done: jobs.filter(j=> j.status==='done')
   }
 
+  async function moveJob(id:number, dir:'left'|'right'){
+    // optimistic move
+    const prev = jobs
+    const idx = prev.findIndex(j=> j.id===id)
+    if (idx===-1) return
+    const job = prev[idx]
+    const order = ['todo','inprogress','done']
+    const curIdx = order.indexOf(job.status)
+    const targetIdx = dir==='left' ? Math.max(0, curIdx-1) : Math.min(order.length-1, curIdx+1)
+    const newStatus = order[targetIdx]
+    const updated = { ...job, status: newStatus }
+    setJobs(prevJobs => prevJobs.map(j=> j.id===id ? updated : j))
+
+    try{
+      const res = await fetch(`/api/jobs/${id}`,{ method:'PATCH', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status: newStatus }) })
+      if(!res.ok) throw new Error('failed')
+    }catch(e){
+      // rollback
+      setJobs(prev)=>prev.map(j=> j.id===id ? job : j)
+      console.error('move failed',e)
+    }
+  }
+
   return (
     <div style={{padding:20}}>
       <h1 style={{fontSize:24,marginBottom:12}}>Jobs & Kanban</h1>
@@ -88,7 +111,7 @@ export default function JobsPage(){
   )
 }
 
-function JobCard({job, onUpdate}:{job:any,onUpdate:(id:number,fields:any)=>void}){
+function JobCard({job, onUpdate, onMove}:{job:any,onUpdate:(id:number,fields:any)=>void,onMove:(id:number,dir:'left'|'right')=>void}){
   return (
     <div style={{padding:8,marginBottom:8,border:'1px solid var(--border)',borderRadius:6,background:'var(--panel)'}}>
       <div style={{fontWeight:700}}>{job.title}</div>
@@ -96,6 +119,8 @@ function JobCard({job, onUpdate}:{job:any,onUpdate:(id:number,fields:any)=>void}
       <div style={{marginTop:8,display:'flex',gap:8}}>
         <Button onClick={()=>onUpdate(job.id,{ status: 'inprogress' })}>Start</Button>
         <Button onClick={()=>onUpdate(job.id,{ status: 'done' })}>Done</Button>
+        <Button onClick={()=>onMove(job.id,'left')} aria-label="Move left">◀</Button>
+        <Button onClick={()=>onMove(job.id,'right')} aria-label="Move right">▶</Button>
       </div>
     </div>
   )
