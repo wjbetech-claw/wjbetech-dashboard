@@ -1,10 +1,12 @@
 import express from 'express';
 import reposRouter from './routes/repos';
+import githubRouter from './routes/github';
 
 const app = express();
 app.use(express.json());
 
 app.use('/api/repos', reposRouter);
+app.use('/api/github', githubRouter);
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
