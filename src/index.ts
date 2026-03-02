@@ -18,14 +18,20 @@ app.get('/', (_req, res) => {
 async function loadOptionalRouter(relPath: string) {
   const fullPathTs = path.join(process.cwd(), 'src', relPath + '.ts')
   const fullPathJs = path.join(process.cwd(), 'dist', relPath + '.js')
-  if (fs.existsSync(fullPathTs) || fs.existsSync(fullPathJs)) {
-    try {
-      const mod = await import(`./${relPath}`)
+  try {
+    if (fs.existsSync(fullPathTs)) {
+      const url = `file://${fullPathTs}`
+      const mod = await import(url)
       return mod.default
-    } catch (err) {
-      console.warn('failed to import', relPath, err)
-      return null
     }
+    if (fs.existsSync(fullPathJs)) {
+      const url = `file://${fullPathJs}`
+      const mod = await import(url)
+      return mod.default
+    }
+  } catch (err) {
+    console.warn('failed to import', relPath, err)
+    return null
   }
   return null
 }
