@@ -1,28 +1,48 @@
-import express from 'express';
-// Only import routers that exist under src/routes/api to avoid startup import errors
-import featuredReposRouter from './routes/api/featuredRepos';
-import repoActivitiesRouter from './routes/api/repoActivities';
-import prTrackingRouter from './routes/api/prTracking';
+import express from 'express'
+import fs from 'fs'
+import path from 'path'
 
-const app = express();
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const app = express()
+const port = process.env.PORT ? Number(process.env.PORT) : 3000
 
-app.use(express.json());
+app.use(express.json())
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString() });
-});
+  res.json({ status: 'ok', time: new Date().toISOString() })
+})
 
 app.get('/', (_req, res) => {
-  res.send('wjbetech-dashboard backend');
-});
+  res.send('wjbetech-dashboard backend')
+})
 
-// Mount available API routes
-app.use('/api/featured', featuredReposRouter);
-app.use('/api/repo-activities', repoActivitiesRouter);
-app.use('/api/pr-tracking', prTrackingRouter);
+async function loadOptionalRouter(relPath: string) {
+  const fullPathTs = path.join(process.cwd(), 'src', relPath + '.ts')
+  const fullPathJs = path.join(process.cwd(), 'dist', relPath + '.js')
+  if (fs.existsSync(fullPathTs) || fs.existsSync(fullPathJs)) {
+    try {
+      const mod = await import(`./${relPath}`)
+      return mod.default
+    } catch (err) {
+      console.warn('failed to import', relPath, err)
+      return null
+    }
+  }
+  return null
+}
 
-app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server listening on port ${port}`);
-});
+(async function main(){
+  // Conditionally mount routers if their files exist
+  const featured = await loadOptionalRouter('routes/api/featuredRepos')
+  if (featured) app.use('/api/featured', featured)
+
+  const activities = await loadOptionalRouter('routes/api/repoActivities')
+  if (activities) app.use('/api/repo-activities', activities)
+
+  const prTracking = await loadOptionalRouter('routes/api/prTracking')
+  if (prTracking) app.use('/api/pr-tracking', prTracking)
+
+  app.listen(port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server listening on port ${port}`)
+  })
+})()
