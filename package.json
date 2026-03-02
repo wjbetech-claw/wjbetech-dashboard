@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:backend": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:frontend": "vite",
+    "dev": "npm run dev:backend & npm run dev:frontend",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "echo 'eslint not configured - skip'",
     "test": "echo \"No tests configured\" && exit 0"
   },
+
   "engines": {
     "node": ">=18"
   },
