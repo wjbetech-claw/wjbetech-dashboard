@@ -18,26 +18,22 @@ Following docs/todo.md — topmost unchecked tasks. OpenClaw will work from the 
 
 - [ ] Task 1.6: GitHub backend wiring — fetch featured repos, repo activities, and PR tracking
 
-  Plan:
-  - Add backend endpoints under /api/github to proxy and aggregate GitHub data for the UI. Endpoints:
-    - GET /api/github/featured -> returns a curated list of featured repos (from config/db) for orgs wjbetech and wjbetech-claw.
-    - GET /api/github/repos/:owner/:repo/activities -> returns latest jobs/updates (from internal jobs table) and recent commits.
-    - GET /api/github/orgs/:org/prs?limit=5 -> returns last N PRs for the organization.
-  - Implementation details:
-    1. Store a small config table (featured_repos) in Postgres with owner/repo and a 'featured' flag. Seed it via migration.
-    2. Use the existing Octokit wrapper (backend/src/services/octokit.ts) to query the GitHub API. Implement rate-limit handling and caching (short TTL, in-memory LRU or Redis if available).
-    3. Implement service functions that accept an authenticated Octokit instance and assemble responses: merge GitHub API data (commits, PRs) with internal DB job records (jobs table) to surface latest job status and timestamps.
-    4. Secure endpoints with token-based access (GITHUB_TOKEN via env) and validate inputs. Respect GitHub API permissions and pagination.
-    5. Add unit tests for service logic (mock Octokit responses) and integration tests that exercise the endpoints (use nock or msw to mock GitHub responses).
-    6. Wire the frontend Repos page to call GET /api/github/featured and per-repo activities/PRs endpoints.
-  - Rollout plan:
-    - Add endpoints and tests behind feature flags in config; deploy to staging and validate UI.
-    - Monitor rate limits and cache hit rates, adjust TTL and fallbacks (graceful degradation when GitHub is unavailable).
+  Subtasks:
+  - [ ] Task 1.6.1: DB migration & seed — create featured_repos table and seed initial entries for wjbetech and wjbetech-claw.
+  - [ ] Task 1.6.2: Octokit service & caching — improve Octokit wrapper with rate-limit awareness and in-memory caching.
+  - [ ] Task 1.6.3: API endpoints — implement /api/github/featured, /api/github/repos/:owner/:repo/activities, /api/github/orgs/:org/prs.
+  - [ ] Task 1.6.4: Service tests — unit tests mocking Octokit responses and verifying aggregation logic.
+  - [ ] Task 1.6.5: Integration tests & CI — add integration tests for endpoints using msw/nock and enable CI steps to run them.
+  - [ ] Task 1.6.6: Frontend wiring — connect Repos page to the new endpoints, fetch activities and PRs, display dates and links.
+
+  High-level plan:
+  - Implement 1.6.1 first (DB migration + seed) so the backend has a persisted source of featured repos.
+  - Then implement 1.6.2 (Octokit improvements) and 1.6.3 (endpoints) in small PRs, each with unit tests (1.6.4).
+  - Enable integration tests (1.6.5) and wire frontend (1.6.6).
 
   Notes:
-  - This task may require a GitHub App or higher-scoped token if you need org-level data; start with a PAT in env for initial development and switch to an app if needed.
-  - Treat this as Task 1.6 and split into smaller PRs if implementation grows large.
-
+  - Start with a PAT in env for dev; consider GitHub App later for org-level permissions.
+  - Keep each subtask small and independently mergeable.
 
 
 ## Phase 2: Frontend Components & Pages (UI Build)
