@@ -24,6 +24,47 @@ export PR_GUIDELINES_TEXT
 
 ACK_RE='followed PR_GUIDELINES\.md'
 
+sanitize_pr_body_text() {
+  python3 - <<'PY'
+import re
+import sys
+
+s = sys.stdin.read()
+s = s.replace("\r\n", "\n").replace("\r", "\n")
+s = re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", s)
+s = re.sub(r"�\[[0-9;]*[ -/]*[@-~]", "", s)
+
+drop_line_patterns = [
+  r"^up to date, audited \d+ packages.*$",
+  r"^\d+ packages are looking for funding$",
+  r"^run npm fund for details$",
+  r"^found \d+ vulnerabilities$",
+  r"^\s*RUN\s+v[0-9].*$",
+  r"^\s*Test Files\b.*$",
+  r"^\s*Tests\b.*$",
+  r"^\s*Start at\b.*$",
+  r"^\s*Duration\b.*$",
+  r"^\s*.*\.test\.[jt]sx?\s+\(.*$",
+]
+
+compiled = [re.compile(p, re.IGNORECASE) for p in drop_line_patterns]
+out_lines = []
+for line in s.split("\n"):
+  stripped = line.strip()
+  if "�[" in line:
+    continue
+  if any(p.match(stripped) for p in compiled):
+    continue
+  out_lines.append(line)
+
+clean = "\n".join(out_lines)
+clean = re.sub(r"\n{3,}", "\n\n", clean).strip()
+if clean:
+  clean += "\n"
+sys.stdout.write(clean)
+PY
+}
+
 # Parse args so we can validate body/body-file before calling gh
 REPO=""
 TITLE=""
@@ -73,6 +114,11 @@ else
   exit 2
 fi
 
+SANITIZED_BODY_FILE="$(mktemp)"
+trap 'rm -f "$SANITIZED_BODY_FILE"' EXIT
+printf '%s' "$BODY_CONTENT" | sanitize_pr_body_text > "$SANITIZED_BODY_FILE"
+BODY_CONTENT="$(cat "$SANITIZED_BODY_FILE")"
+
 # Reject literal "\n" sequences (double-escaped content)
 echo "$BODY_CONTENT" | grep -q '\\n' && {
   printf "ERROR: PR body contains literal \\n escape sequences; must contain real newlines." >&2
@@ -104,17 +150,9 @@ for section in "## Summary" "## Why" "## What changed" "## How to test"; do
   }
 done
 
-# If we got here, body passes. Call gh.
-if [[ -n "$BODY_FILE" ]]; then
-  if [[ -n "$HEAD_REF" ]]; then
-    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --head "$HEAD_REF" --body-file "$BODY_FILE" "$@"
-  else
-    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --body-file "$BODY_FILE" "$@"
-  fi
+# If we got here, body passes. Call gh with sanitized body-file.
+if [[ -n "$HEAD_REF" ]]; then
+  gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --head "$HEAD_REF" --body-file "$SANITIZED_BODY_FILE" "$@"
 else
-  if [[ -n "$HEAD_REF" ]]; then
-    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --head "$HEAD_REF" --body "$BODY" "$@"
-  else
-    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --body "$BODY" "$@"
-  fi
+  gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --body-file "$SANITIZED_BODY_FILE" "$@"
 fi
