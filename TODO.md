@@ -64,7 +64,9 @@ Following docs/todo.md — topmost unchecked tasks. OpenClaw will work from the 
 
     2026-03-02T13:26:00Z | chore/coverage-triage | attempted | Ran local test runner; encountered environment dependency errors (msw devDependency and vitest coverage plugin). Next: fix devDependencies (@vitest/coverage-v8 or adjust vitest config) so coverage can run in CI/workspace.
   - [ ] Task 3.1.2: Backend tests — add unit tests for githubService and activeJob (mock Octokit + DB).
-  - [ ] Task 3.1.3: Frontend tests — add Vitest/jsdom tests for Jobs Kanban (create, move, rollback).
+  - [x] Task 3.1.3: Frontend tests — add Vitest/jsdom tests for Jobs Kanban (create, move, rollback).
+
+    2026-03-03T05:xx:00Z | feat/tests-frontend-jobs | committed | Added frontend Kanban smoke and focused tests (PRs #208, #212).
   - [ ] Task 3.1.4: Integration tests — add supertest tests for /api/jobs ordering persistence and /api/github endpoints.
 
 - [ ] Task 3.2: Accessibility Audit & Fixes — axe-core 0 violations
