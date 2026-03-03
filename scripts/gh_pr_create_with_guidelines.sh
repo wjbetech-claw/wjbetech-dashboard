@@ -28,6 +28,7 @@ ACK_RE='followed PR_GUIDELINES\.md'
 REPO=""
 TITLE=""
 BASE="main"
+HEAD_REF=""
 BODY=""
 BODY_FILE=""
 
@@ -39,6 +40,8 @@ while [[ $# -gt 0 ]]; do
       TITLE="$2"; shift 2;;
     --base)
       BASE="$2"; shift 2;;
+    --head)
+      HEAD_REF="$2"; shift 2;;
     --body)
       BODY="$2"; shift 2;;
     --body-file)
@@ -82,6 +85,12 @@ printf '%s' "$BODY_CONTENT" | LC_ALL=C grep -q $'\x1b' && {
   exit 2
 }
 
+# Reject literal escaped ANSI sequences and common mojibake escape artifacts.
+echo "$BODY_CONTENT" | grep -Eqi '\\u001b|\\x1b|�\[' && {
+  echo "ERROR: PR body appears to contain escaped/garbled ANSI output; sanitize terminal logs before PR creation." >&2
+  exit 2
+}
+
 # Hard requirements (tune these to match your PR_GUIDELINES.md)
 echo "$BODY_CONTENT" | grep -Eqi "$ACK_RE" || {
   echo "ERROR: PR body must include acknowledgment: 'I followed PR_GUIDELINES.md' (case-insensitive)" >&2
@@ -97,7 +106,15 @@ done
 
 # If we got here, body passes. Call gh.
 if [[ -n "$BODY_FILE" ]]; then
-  gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --body-file "$BODY_FILE" "$@"
+  if [[ -n "$HEAD_REF" ]]; then
+    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --head "$HEAD_REF" --body-file "$BODY_FILE" "$@"
+  else
+    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --body-file "$BODY_FILE" "$@"
+  fi
 else
-  gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --body "$BODY" "$@"
+  if [[ -n "$HEAD_REF" ]]; then
+    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --head "$HEAD_REF" --body "$BODY" "$@"
+  else
+    gh pr create -R "$REPO" --title "$TITLE" --base "$BASE" --body "$BODY" "$@"
+  fi
 fi
