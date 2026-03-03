@@ -117,6 +117,32 @@ run_local_checks() {
   npm --prefix apps/wjbetech-dashboard run build
 }
 
+sanitize_pr_body() {
+  python3 - <<'PY'
+import re, sys
+s = sys.stdin.read()
+
+# Convert literal backslash escapes into real newlines if they appear
+s = s.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\r", "\n")
+
+# Normalize newlines
+s = s.replace("\r\n", "\n").replace("\r", "\n")
+
+# Strip ANSI escape sequences
+s = re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", s)
+
+# Strip control chars except newline/tab
+s = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", s)
+
+# Cap size to keep PR bodies human
+max_chars = 5000
+if len(s) > max_chars:
+  s = s[:max_chars].rstrip() + "\n\n[truncated]\n"
+
+print(s, end="")
+PY
+}
+
 create_pr() {
   local branch="$1"
   local title="$2"
@@ -127,15 +153,19 @@ create_pr() {
   local body_prefix
   body_prefix=$'I followed PR_GUIDELINES.md\n\n## Summary\n- \n\n## Why\n- \n\n## What changed\n- \n\n## How to test\n- \n\n## Risks / Rollback\n- \n\n---\n'
 
-  # Put the original "body" content under the template so we keep context.
-  body="${body_prefix}### Notes\n${body}\n"
+  body="${body_prefix}${body}"
 
-  # Create PR (works across gh versions). Prints URL via pr view after creation.
+  local body_file
+  body_file="$(mktemp)"
+  printf '%s' "$body" | sanitize_pr_body > "$body_file"
+
   scripts/gh_pr_create_with_guidelines.sh -R "$REPO" \
     --title "$title" \
-    --body "$body" \
+    --body-file "$body_file" \
     --head "$branch" \
     --base main >/dev/null
+
+  rm -f "$body_file"
 
   gh pr view -R "$REPO" --json url --jq .url
 }
