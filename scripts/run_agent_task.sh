@@ -14,67 +14,29 @@ echo "[RUNNER] task: $task"
 CONTAINER_NAME="${CONTAINER_NAME:-openclaw-openclaw-gateway-1}"
 # --------------
 
-command -v docker >/dev/null 2>&1 || { echo "[RUNNER] docker not found"; exit 127; }
+# If we're already running inside the gateway container, we must NOT require docker.
+# In-container mode should run directly from /workspace.
+IN_CONTAINER=0
+if [[ -f "/.dockerenv" ]] || grep -qaE 'docker|containerd|kubepods' /proc/1/cgroup 2>/dev/null; then
+  IN_CONTAINER=1
+fi
 
-docker ps --format '{{.Names}}' | grep -qx "$CONTAINER_NAME" || {
-  echo "[RUNNER] container not running or not found: $CONTAINER_NAME"
-  echo "[RUNNER] running containers:"
-  docker ps --format '  - {{.Names}}'
-  exit 1
-}
+run_agent_in_repo() {
+  local repo_path="$1"
+  echo "[RUNNER] repo_path=$repo_path"
 
-detect_repo_path() {
-  # Prefer reality: your container repo root is /workspace
-  local candidates=(
-    "/workspace"
-    "/workspace/apps/wjbetech-dashboard"
-    "/workspace/wjbetech-dashboard"
-  )
+  cd "$repo_path"
 
-  for p in "${candidates[@]}"; do
-    if docker exec -i -u node "$CONTAINER_NAME" sh -lc "ls -la /workspace; ls -la /workspace/apps || true" >/dev/null 2>&1; then
-      echo "$p"
-      return 0
-    fi
-  done
-  return 1
-}
-
-REPO_PATH="$(detect_repo_path)" || {
-  echo "[RUNNER] Could not find repo inside container."
-  echo "[RUNNER] Debug listing:"
-  docker exec -i "$CONTAINER_NAME" sh -lc "ls -la /workspace; ls -la /workspace/apps || true" || true
-  exit 1
-}
-
-echo "[RUNNER] container=$CONTAINER_NAME repo_path=$REPO_PATH"
-
-# Run the agent inside the container, on the CURRENT branch (created by supervisor)
-docker exec -i "$CONTAINER_NAME" sh -lc "
-  set -e
-  cd '$REPO_PATH'
-
-  echo '[RUNNER] pwd:' \$(pwd)
+  echo "[RUNNER] pwd: $(pwd)"
   git status --porcelain=v1 --branch || true
 
-  branch=\$(git rev-parse --abbrev-ref HEAD)
-  echo '[RUNNER] branch:' \$branch
-  if [ \"\$branch\" = \"main\" ]; then
-    echo 'BLOCKED: runner is on main; supervisor should create a task branch first'
+  local branch
+  branch="$(git rev-parse --abbrev-ref HEAD)"
+  echo "[RUNNER] branch: $branch"
+  if [[ "$branch" == "main" ]]; then
+    echo "BLOCKED: runner is on main; supervisor should create a task branch first"
     exit 1
   fi
-
-  echo '[RUNNER] context: top-level listing'
-  ls -la
-
-  echo '[RUNNER] context: TODO.md (first 200 lines)'
-  sed -n '1,200p' TODO.md || true
-
-  echo '[RUNNER] context: backend listing'
-  ls -la backend || true
-
-  echo '[RUNNER] context: src listing'
-  ls -la src || true
 
   cat > /tmp/openclaw_task.txt <<'EOF_INNER'
 You are a non-interactive coding worker operating inside a git repo. Your only job is to edit files to implement the task.
@@ -104,71 +66,41 @@ Failure criteria (use only for real blockers):
   and exit non-zero.
 EOF_INNER
 
-  printf '\nTask:\n%s\n' \"${task}\" >> /tmp/openclaw_task.txt
+  printf '\nTask:\n%s\n' "$task" >> /tmp/openclaw_task.txt
 
-  # --- PROTECT SUPERVISOR FILES INSIDE CONTAINER ---
+  # Protect supervisor scripts from the agent
   chmod -w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
-  # --------------------------------------------------
 
-  out=\$(openclaw agent --agent dashboard --message \"\$(cat /tmp/openclaw_task.txt)\" --timeout 3600 --json 2>&1) || {
-    echo \"\$out\"
-
-    # --- RESTORE PERMISSIONS ON FAILURE ---
+  out="$(openclaw agent --agent dashboard --message "$(cat /tmp/openclaw_task.txt)" --timeout 3600 --json 2>&1)" || {
+    echo "$out"
     chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
-    # --------------------------------------
-
     exit 1
   }
 
-  echo \"\$out\"
+  echo "$out"
 
-  # --- RESTORE PERMISSIONS AFTER SUCCESS ---
   chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
-  # -----------------------------------------
 
-  echo \"\$out\" | grep -q 'BLOCKED:' && exit 1
+  echo "$out" | grep -q 'BLOCKED:' && exit 1
+}
 
-  out=\$(openclaw agent --agent dashboard --message \"\$(cat /tmp/openclaw_task.txt)\" --timeout 3600 --json 2>&1) || {
-    echo \"\$out\"
-    exit 1
-  }
-
-  echo \"\$out\"
-
-  echo \"\$out\" | grep -q 'BLOCKED:' && exit 1
-"
-
-# --- SYNC CHANGES FROM CONTAINER -> HOST ---
-echo "[RUNNER] syncing changes from container to host..."
-
-# Collect changed + untracked files inside container
-changed_files="$(
-  docker exec -i "$CONTAINER_NAME" sh -lc "
-    set -e
-    cd '$REPO_PATH'
-    (git diff --name-only; git ls-files -o --exclude-standard) | sed '/^\s*$/d' | sort -u
-  "
-)"
-
-if [[ -z "$changed_files" ]]; then
-  echo "[RUNNER] no changed files found inside container to sync"
-  exit 1
+if [[ "$IN_CONTAINER" -eq 1 ]]; then
+  run_agent_in_repo "/workspace"
+  exit 0
 fi
 
-echo "[RUNNER] files to sync:"
-echo "$changed_files" | sed 's/^/  - /'
+# Host mode requires docker.
+command -v docker >/dev/null 2>&1 || { echo "[RUNNER] docker not found (host mode)"; exit 127; }
 
-# Copy each file out of the container into the host repo root
-while IFS= read -r f; do
-  [[ -z "$f" ]] && continue
+docker ps --format '{{.Names}}' | grep -qx "$CONTAINER_NAME" || {
+  echo "[RUNNER] container not running or not found: $CONTAINER_NAME"
+  docker ps --format '  - {{.Names}}'
+  exit 1
+}
 
-  # ensure parent dir exists on host
-  mkdir -p "$(dirname "$f")"
-
-  # copy the file from container -> host
-  docker cp "${CONTAINER_NAME}:${REPO_PATH}/${f}" "./${f}"
-done <<< "$changed_files"
-
-echo "[RUNNER] sync complete. Host git status:"
-git status --porcelain=v1 --branch || true
-# ------------------------------------------
+# Run the same script inside the container (single source of truth)
+docker exec -i "$CONTAINER_NAME" sh -lc "
+  set -e
+  cd /workspace
+  ./scripts/run_agent_task.sh \"${task}\"
+"
