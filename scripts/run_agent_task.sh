@@ -21,6 +21,19 @@ if [[ -f "/.dockerenv" ]] || grep -qaE 'docker|containerd|kubepods' /proc/1/cgro
   IN_CONTAINER=1
 fi
 
+sanitize_output() {
+  python3 - <<'PY'
+import re
+import sys
+
+s = sys.stdin.read()
+s = s.replace("\r\n", "\n").replace("\r", "\n")
+s = re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", s)
+s = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", s)
+sys.stdout.write(s)
+PY
+}
+
 run_agent_in_repo() {
   local repo_path="$1"
   echo "[RUNNER] repo_path=$repo_path"
@@ -71,17 +84,19 @@ EOF_INNER
   # Protect supervisor scripts from the agent
   chmod -w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
 
-  out="$(openclaw agent --agent dashboard --message "$(cat /tmp/openclaw_task.txt)" --timeout 3600 --json 2>&1)" || {
+  out="$(NO_COLOR=1 CLICOLOR=0 CLICOLOR_FORCE=0 FORCE_COLOR=0 TERM=dumb \
+    openclaw agent --agent dashboard --message "$(cat /tmp/openclaw_task.txt)" --timeout 3600 2>&1)" || {
     echo "$out"
     chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
     exit 1
   }
 
-  echo "$out"
+  clean_out="$(printf '%s' "$out" | sanitize_output)"
+  echo "$clean_out"
 
   chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
 
-  echo "$out" | grep -q 'BLOCKED:' && exit 1
+  echo "$clean_out" | grep -q 'BLOCKED:' && exit 1
 }
 
 if [[ "$IN_CONTAINER" -eq 1 ]]; then

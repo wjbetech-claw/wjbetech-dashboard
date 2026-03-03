@@ -82,6 +82,12 @@ printf '%s' "$BODY_CONTENT" | LC_ALL=C grep -q $'\x1b' && {
   exit 2
 }
 
+# Reject literal escaped ANSI sequences and common mojibake escape artifacts.
+echo "$BODY_CONTENT" | grep -Eqi '\\u001b|\\x1b|�\[' && {
+  echo "ERROR: PR body appears to contain escaped/garbled ANSI output; sanitize terminal logs before PR creation." >&2
+  exit 2
+}
+
 # Hard requirements (tune these to match your PR_GUIDELINES.md)
 echo "$BODY_CONTENT" | grep -Eqi "$ACK_RE" || {
   echo "ERROR: PR body must include acknowledgment: 'I followed PR_GUIDELINES.md' (case-insensitive)" >&2
