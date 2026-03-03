@@ -1,65 +1,88 @@
-import { Octokit } from 'octokit';
+import { Octokit } from "octokit";
 
-// Simple Octokit wrapper with in-memory caching for common calls
-// This is intentionally small and testable; we'll expand rate-limit handling later.
+type CacheEntry<T> = { value: T; expiresAt: number };
 
-type CacheEntry = {
-  ts: number;
-  data: any;
-};
+class SimpleCache {
+  private store: Map<string, CacheEntry<any>> = new Map();
+  private ttlMs: number;
 
-const CACHE_TTL_MS = 1000 * 60; // 1 minute
-
-export class GithubService {
-  private octokit: Octokit;
-  private cache: Map<string, CacheEntry> = new Map();
-
-  constructor(token?: string) {
-    this.octokit = new Octokit({ auth: token || process.env.GITHUB_PAT });
+  constructor(ttlSeconds = 60) {
+    this.ttlMs = ttlSeconds * 1000;
   }
 
-  private getCached(key: string) {
-    const e = this.cache.get(key);
-    if (!e) return null;
-    if (Date.now() - e.ts > CACHE_TTL_MS) {
-      this.cache.delete(key);
+  get<T>(key: string): T | null {
+    const entry = this.store.get(key);
+    if (!entry) return null;
+    if (Date.now() > entry.expiresAt) {
+      this.store.delete(key);
       return null;
     }
-    return e.data;
+    return entry.value as T;
   }
 
-  private setCached(key: string, data: any) {
-    this.cache.set(key, { ts: Date.now(), data });
+  set<T>(key: string, value: T) {
+    this.store.set(key, { value, expiresAt: Date.now() + this.ttlMs });
   }
 
-  async getRepo(owner: string, repo: string) {
-    const key = `repo:${owner}/${repo}`;
-    const cached = this.getCached(key);
-    if (cached) return cached;
-    const res = await this.octokit.rest.repos.get({ owner, repo });
-    this.setCached(key, res.data);
-    return res.data;
-  }
-
-  async listOrgPRs(org: string, params: { state?: string; per_page?: number } = {}) {
-    const key = `prs:org:${org}:${params.state || 'all'}:${params.per_page || 30}`;
-    const cached = this.getCached(key);
-    if (cached) return cached;
-    // For now fetch first page only; we'll expand pagination later.
-    const res = await this.octokit.rest.pulls.listForOrg({ org, per_page: params.per_page || 30 });
-    this.setCached(key, res.data);
-    return res.data;
-  }
-
-  // lightweight activity fetch — placeholder to be used by endpoints
-  async listRepoEvents(owner: string, repo: string) {
-    const key = `events:${owner}/${repo}`;
-    const cached = this.getCached(key);
-    if (cached) return cached;
-    const res = await this.octokit.rest.activity.listRepoEvents({ owner, repo, per_page: 50 });
-    this.setCached(key, res.data);
-    return res.data;
+  clear() {
+    this.store.clear();
   }
 }
 
-export default new GithubService();
+const cache = new SimpleCache(60); // default 60s cache
+
+export class GitHubService {
+  private octokit: Octokit;
+
+  constructor(authToken?: string, cacheTtlSeconds?: number) {
+    this.octokit = new Octokit({ auth: authToken });
+    if (cacheTtlSeconds) {
+      // replace cache with new TTL
+      // (simple approach for now)
+      // @ts-ignore
+      cache.ttlMs = cacheTtlSeconds * 1000;
+    }
+  }
+
+  async getFeaturedRepos(): Promise<Array<{ owner: string; repo: string; url: string; description?: string }>> {
+    const cacheKey = `featured_repos`;
+    const fromCache = cache.get<typeof Array>(cacheKey);
+    if (fromCache) return fromCache;
+
+    // For now, attempt to read a small list from a GitHub org pinned repos as fallback.
+    // The authoritative list lives in the DB; this service provides an API-level cache and helper methods for GitHub calls.
+    // Return empty — DB seed provides authoritative data. Keep method for future wiring.
+
+    const result: Array<{ owner: string; repo: string; url: string; description?: string }> = [];
+    cache.set(cacheKey, result);
+    return result;
+  }
+
+  async listRecentRepoEvents(owner: string, repo: string, perPage = 30) {
+    const cacheKey = `repo_events:${owner}:${repo}:${perPage}`;
+    const fromCache = cache.get<any>(cacheKey);
+    if (fromCache) return fromCache;
+
+    const resp = await this.octokit.rest.activity.listRepoEvents({ owner, repo, per_page: perPage });
+    const events = resp.data;
+
+    cache.set(cacheKey, events);
+    return events;
+  }
+
+  async listOrgPulls(org: string, perPage = 50) {
+    const cacheKey = `org_pulls:${org}:${perPage}`;
+    const fromCache = cache.get<any>(cacheKey);
+    if (fromCache) return fromCache;
+
+    // Use search API to find recent PRs for an org
+    const q = `org:${org} is:pr`;
+    const resp = await this.octokit.rest.search.issuesAndPullRequests({ q, per_page: perPage });
+    const items = resp.data.items || [];
+
+    cache.set(cacheKey, items);
+    return items;
+  }
+}
+
+export default GitHubService;
