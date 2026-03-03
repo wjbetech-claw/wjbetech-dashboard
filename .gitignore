@@ -6,3 +6,4 @@ dist
 
 # OpenClaw runtime artifacts
 .github/PR_BODIES/
+memory/

@@ -70,6 +70,18 @@ else
   exit 2
 fi
 
+# Reject literal "\n" sequences (double-escaped content)
+echo "$BODY_CONTENT" | grep -q '\\n' && {
+  printf "ERROR: PR body contains literal \\n escape sequences; must contain real newlines." >&2
+  exit 2
+}
+
+# Reject ANSI escape codes (terminal color/control sequences)
+printf '%s' "$BODY_CONTENT" | LC_ALL=C grep -q $'\x1b' && {
+  echo "ERROR: PR body contains ANSI escape codes; do not paste terminal output into PR body." >&2
+  exit 2
+}
+
 # Hard requirements (tune these to match your PR_GUIDELINES.md)
 echo "$BODY_CONTENT" | grep -Eqi "$ACK_RE" || {
   echo "ERROR: PR body must include acknowledgment: 'I followed PR_GUIDELINES.md' (case-insensitive)" >&2
