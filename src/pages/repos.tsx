@@ -10,9 +10,9 @@ export default function ReposPage(){
   const [loading, setLoading] = useState(true)
 
   useEffect(()=>{
-    fetch('/api/github/featured')
+    fetch('/api/featured')
       .then(r=>r.json())
-      .then(d=>{ setRepos(d.repos || []); setLoading(false) })
+      .then(d=>{ setRepos(d || []); setLoading(false) })
       .catch(()=>setLoading(false))
   },[])
 
@@ -56,7 +56,7 @@ function RepoMeta({owner,repo}:{owner:string,repo:string}){
   const [meta, setMeta] = useState<any | null>(null)
   useEffect(()=>{
     let mounted = true
-    fetch(`/api/github/repos/${owner}/${repo}/activities`)
+    fetch(`/api/repo-activities/${owner}/${repo}`)
       .then(r=>r.json())
       .then(d=>{ if(mounted) setMeta(d) })
       .catch(()=>{})
