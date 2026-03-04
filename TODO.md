@@ -30,8 +30,9 @@ Following docs/todo.md - topmost unchecked tasks. OpenClaw will work from the to
   2026-03-04T12:57:00Z | chore/agent-2026-03-04-implement-1.6.5-integration | committed+pushed | Added integration tests (nock) and opened PR #230
   2026-03-04T13:01:00Z | chore/agent-2026-03-04-implement-1.6.6-frontend | committed+pushed | Wired frontend Repos page and opened PR #231
 
-  
-  2026-03-04T13:02:00Z | chore/agent-2026-03-04-complete-1.6 | committed+pushed | Marked Task 1.6 group complete (all subitems done)
+  2026-03-04T13:18:00Z | feat/agent-2026-03-04-task-2.2 | merged | Merged PR #232 - Overview API binding and active-job endpoint
+
+  2026-03-04T13:18:00Z | chore/agent-2026-03-04-complete-1.6 | committed+pushed | Marked Task 1.6 group complete (all subitems done)
 
 
   High-level plan:
