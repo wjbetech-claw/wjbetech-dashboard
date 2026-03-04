@@ -123,7 +123,7 @@ next_todo_with_subtasks() {
     function is_subtask(line) { return line ~ /^[[:space:]]+-[[:space:]]*\[[[:space:]]\][[:space:]]+Task [0-9]+(\.[0-9]+)+/ }
     function is_parent(line) { return line ~ /^[[:space:]]*-[[:space:]]*\[[[:space:]]\][[:space:]]+Task [0-9]+:/ }
     function is_header(line) { return line ~ /^[[:space:]]*## / }
-    function is_label(line) { return line ~ /^[[:space:]]*Subtasks:|^[[:space:]]*High-level plan:|^[[:space:]]*Notes:/ }
+    function is_label(line) { return line ~ /^[[:space:]]*(Subtasks:|High-level plan:|Notes:)/ }
     {
       if (is_parent($0) && is_unchecked($0)) {
         parent_line = NR ":" $0
