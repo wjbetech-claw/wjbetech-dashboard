@@ -9,10 +9,10 @@ export default function Overview(){
 
   useEffect(()=>{
     Promise.all([
-      fetch('/api/github/featured').then(r=>r.json()).catch(()=>({repos:[]})),
+      fetch('/api/featured').then(r=>r.json()).catch(()=>([])),
       fetch('/api/active-job').then(r=>r.json()).catch(()=>({job:null}))
     ]).then(([f,a])=>{
-      setFeatured(f.repos||[])
+      setFeatured(Array.isArray(f) ? f : (f.repos||[]))
       setActiveJob(a.job||null)
       setLoading(false)
     })
@@ -25,13 +25,16 @@ export default function Overview(){
       <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12}}>
         <div>
           <Card>
-            <h3>Featured Repositories</h3>
+            <h3>Featured Repositories <small style={{fontSize:12,color:'var(--muted)',marginLeft:8}}>{featured.length} shown</small></h3>
             {featured.map(r=> (
               <div key={r.id} style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
                 <a href={r.url} target="_blank" rel="noreferrer">{r.full_name}</a>
-                <div style={{fontSize:12,color:'var(--muted)'}}>Latest: placeholder</div>
+                <div style={{fontSize:12,color:'var(--muted)'}}>
+                  Latest: <a href={`/repos/${r.owner}/${r.repo}`} style={{textDecoration:'underline'}}>View details</a>
+                </div>
               </div>
             ))}
+            {featured.length === 0 && <div style={{padding:8}}>No featured repositories configured.</div>}
           </Card>
         </div>
         <div>
