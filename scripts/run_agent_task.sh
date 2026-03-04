@@ -84,14 +84,35 @@ EOF_INNER
   # Protect supervisor scripts from the agent
   chmod -w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
 
+  local log_file
+  log_file="/tmp/openclaw_agent_last.log"
+  rm -f "$log_file"
+
   out="$(NO_COLOR=1 CLICOLOR=0 CLICOLOR_FORCE=0 FORCE_COLOR=0 TERM=dumb \
-    openclaw agent --agent dashboard --message "$(cat /tmp/openclaw_task.txt)" --timeout 3600 2>&1)" || {
+    openclaw agent --agent dashboard --message "$(cat /tmp/openclaw_task.txt)" --timeout 3600 --log-level debug --no-color 2>&1)" || {
+    printf '%s' "$out" > "$log_file"
     echo "$out"
+    echo "[RUNNER] agent output saved to $log_file"
     chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
     exit 1
   }
 
+  printf '%s' "$out" > "$log_file"
+
   clean_out="$(printf '%s' "$out" | sanitize_output)"
+
+  if [[ -z "${clean_out//[[:space:]]/}" ]]; then
+    echo "[RUNNER] agent produced no output; see $log_file"
+    chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
+    exit 1
+  fi
+
+  if git diff --quiet && git diff --cached --quiet; then
+    echo "[RUNNER] agent produced no file changes; see $log_file"
+    chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true
+    exit 1
+  fi
+
   echo "$clean_out"
 
   chmod +w scripts/run_agent_task.sh scripts/autonomous.sh WORKFLOW_AUTO.md 2>/dev/null || true

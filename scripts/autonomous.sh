@@ -115,6 +115,61 @@ next_todo() {
   grep -nE '^\s*-\s*\[\s\]\s+' "$TODO_FILE" | head -n1 || true
 }
 
+next_todo_with_subtasks() {
+  # Prefer the first unchecked subtask under an unchecked parent task.
+  # Output format: "<line_no>:<full line>"
+  awk '
+    function is_unchecked(line) { return line ~ /^[[:space:]]*-\s*\[\s\]\s+/ }
+    function is_subtask(line) { return line ~ /^[[:space:]]+-\s*\[\s\]\s+Task [0-9]+\.[0-9]+/ }
+    function is_parent(line) { return line ~ /^[[:space:]]*-\s*\[\s\]\s+Task [0-9]+:/ }
+    {
+      if (is_unchecked($0)) {
+        if (is_parent($0)) {
+          parent_line = NR ":" $0
+          in_parent = 1
+          next
+        }
+
+        if (in_parent && is_subtask($0)) {
+          print NR ":" $0
+          exit
+        }
+
+        if (in_parent && !is_subtask($0) && is_unchecked($0)) {
+          print parent_line
+          exit
+        }
+
+        if (!in_parent) {
+          print NR ":" $0
+          exit
+        }
+      }
+
+      if (in_parent && $0 ~ /^[[:space:]]*$/) {
+        next
+      }
+
+      if (in_parent && $0 ~ /^[[:space:]]*## /) {
+        print parent_line
+        exit
+      }
+
+      if (in_parent && $0 ~ /^[[:space:]]*-\s*\[[xX]\]/) {
+        next
+      }
+
+      if (in_parent && $0 ~ /^[[:space:]]*[^[:space:]]/) {
+        print parent_line
+        exit
+      }
+    }
+    END {
+      if (in_parent && parent_line != "") print parent_line
+    }
+  ' "$TODO_FILE"
+}
+
 sanitize_branch_slug() {
   # Turn task text into a safe slug: lowercase, alnum+dash, max 40 chars
   # shellcheck disable=SC2001
@@ -360,7 +415,7 @@ main() {
   while true; do
     local item line_no line task slug ts branch pr_url
 
-    item="$(next_todo)"
+    item="$(next_todo_with_subtasks)"
     if [[ -z "$item" ]]; then
       notify "All TODOs complete."
       exit 0
@@ -379,6 +434,10 @@ main() {
     # Always start from a pristine, up-to-date main
     sync_main_safe
     require_clean_tree
+
+    if git show-ref --verify --quiet "refs/heads/$branch"; then
+      git branch -D "$branch"
+    fi
 
     git checkout -b "$branch"
 
