@@ -29,6 +29,7 @@ For each task:
    chore/agent-<YYYY-MM-DD>-<short-slug>
 
 2. Implement only that task.
+   - Read relevant docs and existing patterns before coding.
 3. Ensure quality gates pass:
    - npm run lint (if exists)
    - npm run test (if exists)
@@ -36,7 +37,7 @@ For each task:
    - npm run build (if exists)
 
 4. Open a PR:
-   Title: [agent] <task title>
+   Title: <type>: <task title>  (use conventional commit types: feat/fix/chore/test/docs/refactor)
    Description must include:
    - What changed
    - Why
@@ -51,6 +52,8 @@ For each task:
      - The style for completing tasks should look like this: [x]
 6. Append heartbeat entry.
 7. Move to next unchecked task immediately.
+
+While long-running steps are in progress (tests, CI, merge waits), post a brief status update roughly every 30 minutes.
 
 ---
 

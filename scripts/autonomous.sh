@@ -12,8 +12,6 @@ TODO_FILE="TODO.md"
 # Container: /workspace
 REQUIRED_SUBPATH="/workspace"
 
-BRANCH_PREFIX="auto"
-
 # Local gates: set to 0 if you want CI-only gating (not recommended).
 RUN_LOCAL_CHECKS=1
 
@@ -37,9 +35,20 @@ notify() {
 
   [[ -n "${GITHUB_DEV_PROGRESS_BOT:-}" ]] || { echo "[WARN] GITHUB_DEV_PROGRESS_BOT not set"; return 0; }
 
+  local payload
+  if command -v jq >/dev/null 2>&1; then
+    payload="$(jq -n --arg username "Dev Progress" --arg content "$msg" '{username:$username, content:$content}')"
+  else
+    payload="$(python3 - <<PY
+import json
+print(json.dumps({"username": "Dev Progress", "content": "$msg"}))
+PY
+)"
+  fi
+
   curl -s -H "Content-Type: application/json" \
     -X POST \
-    -d "$(jq -n --arg username "Dev Progress" --arg content "$msg" '{username:$username, content:$content}')" \
+    -d "$payload" \
     "$GITHUB_DEV_PROGRESS_BOT" \
     >/dev/null 2>&1 || echo "[WARN] Discord notification failed"
 }
@@ -47,6 +56,7 @@ notify() {
 require_tools() {
   command -v gh >/dev/null 2>&1 || { echo "[FATAL] gh not found"; exit 127; }
   command -v git >/dev/null 2>&1 || { echo "[FATAL] git not found"; exit 127; }
+  command -v python3 >/dev/null 2>&1 || { echo "[FATAL] python3 not found"; exit 127; }
 }
 
 snapshot() {
@@ -70,10 +80,19 @@ require_repo_root() {
 require_expected_pwd() {
   local pwd
   pwd="$(pwd)"
-  if [[ "$pwd" != *"$REQUIRED_SUBPATH"* ]]; then
-    echo "[FATAL] Must run from a path containing '$REQUIRED_SUBPATH'. Current: $pwd" >&2
-    exit 2
+
+  if [[ -f "/.dockerenv" ]] || grep -qaE 'docker|containerd|kubepods' /proc/1/cgroup 2>/dev/null; then
+    if [[ "$pwd" != *"$REQUIRED_SUBPATH"* ]]; then
+      echo "[FATAL] Must run from a path containing '$REQUIRED_SUBPATH'. Current: $pwd" >&2
+      exit 2
+    fi
+    return 0
   fi
+
+  git rev-parse --show-toplevel >/dev/null 2>&1 || {
+    echo "[FATAL] Not inside a git repository." >&2
+    exit 2
+  }
 }
 
 require_clean_tree() {
@@ -84,11 +103,10 @@ require_clean_tree() {
   fi
 }
 
-sync_main_hard() {
-  # Make local main match origin/main exactly.
+sync_main_safe() {
   git fetch origin
   git checkout main
-  git reset --hard origin/main
+  git pull --ff-only origin main
 }
 
 next_todo() {
@@ -112,9 +130,46 @@ run_local_checks() {
     return 0
   fi
 
-  npm --prefix apps/wjbetech-dashboard install
-  npm --prefix apps/wjbetech-dashboard run lint
-  npm --prefix apps/wjbetech-dashboard run build
+  if [[ -f package-lock.json ]]; then
+    npm ci
+  else
+    npm install
+  fi
+
+  npm run lint --if-present
+  npm run test --if-present
+  npm run typecheck --if-present
+  npm run build --if-present
+}
+
+infer_pr_type() {
+  local text="$1"
+  local lower
+  lower="$(printf '%s' "$text" | tr '[:upper:]' '[:lower:]')"
+
+  if [[ "$lower" == fix* ]]; then echo "fix"; return; fi
+  if [[ "$lower" == feat* ]]; then echo "feat"; return; fi
+  if [[ "$lower" == test* ]]; then echo "test"; return; fi
+  if [[ "$lower" == docs* ]]; then echo "docs"; return; fi
+  if [[ "$lower" == refactor* ]]; then echo "refactor"; return; fi
+
+  echo "chore"
+}
+
+status_heartbeat() {
+  local label="$1"
+  local last_ts="$2"
+  local now
+  now="$(date +%s)"
+
+  if (( now - last_ts >= 1800 )); then
+    notify "Still working: $label"
+    echo "[STATUS] $(date -u +%Y-%m-%dT%H:%M:%SZ) | $label"
+    echo "$now"
+    return 0
+  fi
+
+  echo "$last_ts"
 }
 
 sanitize_pr_body() {
@@ -186,6 +241,8 @@ wait_for_ci() {
   local run_id=""
   local status=""
   local conclusion=""
+  local last_update
+  last_update="$(date +%s)"
 
   # Wait until a run exists (CI might take a moment to start)
   for _ in $(seq 1 60); do
@@ -194,6 +251,7 @@ wait_for_ci() {
       break
     fi
     sleep "$CI_POLL_SECONDS"
+    last_update="$(status_heartbeat "waiting for CI on $branch" "$last_update")"
   done
 
   if [[ -z "$run_id" || "$run_id" == "null" ]]; then
@@ -221,11 +279,14 @@ wait_for_ci() {
     fi
 
     sleep "$CI_POLL_SECONDS"
+    last_update="$(status_heartbeat "waiting for CI on $branch" "$last_update")"
   done
 }
 
 wait_for_merge() {
   local pr_url="$1"
+  local last_update
+  last_update="$(date +%s)"
 
   notify "Waiting for PR to merge: $pr_url"
 
@@ -239,6 +300,7 @@ wait_for_merge() {
     fi
 
     sleep "$CI_POLL_SECONDS"
+    last_update="$(status_heartbeat "waiting for merge $pr_url" "$last_update")"
   done
 }
 
@@ -246,7 +308,7 @@ mark_todo_done_via_pr() {
   local line_no="$1"
   local task="$2"
 
-  sync_main_hard
+  sync_main_safe
 
   local ts branch pr_url
   ts="$(date +%Y%m%d-%H%M%S)"
@@ -308,14 +370,14 @@ main() {
     line="${item#*:}"
     task="${line#*] }"
     slug="$(sanitize_branch_slug "$task")"
-    ts="$(date +%Y%m%d-%H%M%S)"
-    branch="${BRANCH_PREFIX}/${ts}-${slug}"
+    ts="$(date +%Y-%m-%d)"
+    branch="chore/agent-${ts}-${slug}"
 
     notify "Starting TODO (line $line_no): $task"
     require_clean_tree
 
     # Always start from a pristine, up-to-date main
-    sync_main_hard
+    sync_main_safe
     require_clean_tree
 
     git checkout -b "$branch"
@@ -334,11 +396,14 @@ main() {
     # Local gates before commit/PR
     run_local_checks
 
+    pr_type="$(infer_pr_type "$task")"
+    pr_title="${pr_type}: ${task}"
+
     git add -A
-    git commit -m "chore: ${task}"
+    git commit -m "$pr_title"
     git push -u origin "$branch"
 
-    pr_url="$(create_pr "$branch" "$task" "Automated change for TODO line $line_no: $line")"
+    pr_url="$(create_pr "$branch" "$pr_title" "Automated change for TODO line $line_no: $line")"
     notify "PR created: $pr_url"
 
     if enable_auto_merge "$pr_url"; then
