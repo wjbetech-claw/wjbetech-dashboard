@@ -21,13 +21,14 @@ Main must always stay deployable.
 
 ## 🔒 Working Directory (Container Correct — Non-Negotiable)
 
-All commands MUST run from:
+All commands MUST run from the repo root.
 
+Container:
 ```bash
 cd /workspace/
 ```
 
-Never use host paths such as `/home/will/...`.
+Never use `/workspace/apps/wjbetech-dashboard` or any `apps/` path.
 
 Before any task begins, execute and print:
 
@@ -67,10 +68,14 @@ If not, fix it before proceeding.
 
 For each TODO item:
 
+### 0️⃣ Read relevant docs
+
+- README.md, WORKFLOW_AUTO.md, and any feature-specific docs or patterns.
+
 ### 1️⃣ Create a branch
 
 ```bash
-git checkout -b feat/<short-task-name>
+git checkout -b chore/agent-<YYYY-MM-DD>-<short-task-name>
 ```
 
 Branch names must reflect scope.
@@ -82,15 +87,18 @@ Branch names must reflect scope.
 - Make minimal, focused changes
 - Do not refactor unrelated areas
 - Keep PRs small
+- Add or update tests for new behavior
 
 ---
 
 ### 3️⃣ Run local checks before committing
 
 ```bash
-npm --prefix apps/wjbetech-dashboard install
-npm --prefix apps/wjbetech-dashboard run lint
-npm --prefix apps/wjbetech-dashboard run build
+npm ci
+npm run lint --if-present
+npm run test --if-present
+npm run typecheck --if-present
+npm run build --if-present
 ```
 
 If any command fails:
@@ -105,7 +113,7 @@ If any command fails:
 
 ```bash
 git add .
-git commit -m "feat: <clear description>"
+git commit -m "<type>: <clear description>"
 ```
 
 ---
@@ -126,7 +134,7 @@ If it prompts → infrastructure error → stop and report.
 
 ```bash
 gh pr create \
-  --title "feat: <description>" \
+  --title "<type>: <description>" \
   --body "Implements TODO item: <reference>" \
   --base main
 ```
@@ -185,7 +193,7 @@ Do NOT:
 - Continue after a failed command
 - Skip lint/tests
 - Modify multiple TODO items in one PR
-- Use host filesystem paths
+- Use host filesystem paths for container-only runs
 
 ---
 
@@ -264,27 +272,4 @@ A task is done when:
 This workflow is mandatory.
 
 If any step cannot be executed, report why immediately.
-This document defines the **repeatable, mostly-autonomous workflow** for developing and maintaining the `wjbetech-dashboard` app.  
-It is designed so that a human (you) or an agent (OpenClaw / CI-driven automation) can execute tasks consistently, create PRs safely, and keep the main branch green.
-
 ---
-
-## Goals
-
-1. Convert `todo.md` items into small, safe PRs.
-2. Keep `main` always deployable.
-3. Auto-merge PRs **only** when checks pass.
-4. Detect snags early and surface them immediately (CI failures, build breaks, env issues).
-5. Make it easy to “continue to the next task” without re-triaging every time.
-
----
-
-## Repo Boundaries & Working Directory (Non-Negotiable)
-
-**Always run commands from the app root:**
-
-- If this app lives at: `openclaw/apps/wjbetech-dashboard/`
-- Then your working directory for *everything* should be:
-
-```bash
-cd /home/will/openclaw/apps/wjbetech-dashboard

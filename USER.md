@@ -2,15 +2,15 @@
 
 _Learn about the person you're helping. Update this as you go._
 
-- **Name:**
-- **What to call them:**
-- **Pronouns:** _(optional)_
+- **Name:** Will
+- **What to call them:** Will
+- **Pronouns:**
 - **Timezone:**
-- **Notes:**
+- **Notes:** OpenClaw owner
 
 ## Context
 
-_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+Primary objective: build and improve web applications (Next.js, Vite, TypeScript, TailwindCSS, Zod, etc.) with minimal supervision.
 
 ---
 
