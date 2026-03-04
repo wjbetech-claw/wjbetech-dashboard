@@ -122,45 +122,38 @@ next_todo_with_subtasks() {
     function is_unchecked(line) { return line ~ /^[[:space:]]*-[[:space:]]*\[[[:space:]]\][[:space:]]+/ }
     function is_subtask(line) { return line ~ /^[[:space:]]+-[[:space:]]*\[[[:space:]]\][[:space:]]+Task [0-9]+(\.[0-9]+)+/ }
     function is_parent(line) { return line ~ /^[[:space:]]*-[[:space:]]*\[[[:space:]]\][[:space:]]+Task [0-9]+:/ }
+    function is_header(line) { return line ~ /^[[:space:]]*## / }
+    function is_label(line) { return line ~ /^[[:space:]]*Subtasks:|^[[:space:]]*High-level plan:|^[[:space:]]*Notes:/ }
     {
-      if (is_unchecked($0)) {
-        if (is_parent($0)) {
-          parent_line = NR ":" $0
-          in_parent = 1
-          next
-        }
+      if (is_parent($0) && is_unchecked($0)) {
+        parent_line = NR ":" $0
+        in_parent = 1
+        next
+      }
 
-        if (in_parent && is_subtask($0)) {
-          print NR ":" $0
-          exit
-        }
-
-        if (in_parent && !is_subtask($0) && is_unchecked($0)) {
+      if (in_parent) {
+        if (is_header($0)) {
           print parent_line
           exit
         }
 
-        if (!in_parent) {
+        if (is_subtask($0) && is_unchecked($0)) {
           print NR ":" $0
+          exit
+        }
+
+        if (is_label($0) || $0 ~ /^[[:space:]]*$/) {
+          next
+        }
+
+        if (is_parent($0) && is_unchecked($0)) {
+          print parent_line
           exit
         }
       }
 
-      if (in_parent && $0 ~ /^[[:space:]]*$/) {
-        next
-      }
-
-      if (in_parent && $0 ~ /^[[:space:]]*## /) {
-        print parent_line
-        exit
-      }
-
-      if (in_parent && $0 ~ /^[[:space:]]*-[[:space:]]*\[[xX]\]/) {
-        next
-      }
-
-      if (in_parent && $0 ~ /^[[:space:]]*[^[:space:]]/) {
-        print parent_line
+      if (!in_parent && is_unchecked($0)) {
+        print NR ":" $0
         exit
       }
     }
