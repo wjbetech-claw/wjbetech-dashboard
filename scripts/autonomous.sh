@@ -116,7 +116,7 @@ next_todo() {
 }
 
 next_todo_with_subtasks() {
-  # Prefer the first unchecked subtask under an unchecked parent task.
+  # Prefer the first unchecked subtask under the first unchecked parent task.
   # Output format: "<line_no>:<full line>"
   awk '
     function is_unchecked(line) { return line ~ /^[[:space:]]*-[[:space:]]*\[[[:space:]]\][[:space:]]+/ }
@@ -125,13 +125,13 @@ next_todo_with_subtasks() {
     function is_header(line) { return line ~ /^[[:space:]]*## / }
     function is_label(line) { return line ~ /^[[:space:]]*(Subtasks:|High-level plan:|Notes:)/ }
     {
-      if (is_parent($0) && is_unchecked($0)) {
+      if (!found_parent && is_parent($0) && is_unchecked($0)) {
         parent_line = NR ":" $0
-        in_parent = 1
+        found_parent = 1
         next
       }
 
-      if (in_parent) {
+      if (found_parent) {
         if (is_header($0)) {
           print parent_line
           exit
@@ -151,14 +151,9 @@ next_todo_with_subtasks() {
           exit
         }
       }
-
-      if (!in_parent && is_unchecked($0)) {
-        print NR ":" $0
-        exit
-      }
     }
     END {
-      if (in_parent && parent_line != "") print parent_line
+      if (found_parent && parent_line != "") print parent_line
     }
   ' "$TODO_FILE"
 }
