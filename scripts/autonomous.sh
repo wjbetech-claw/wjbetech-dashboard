@@ -119,9 +119,9 @@ next_todo_with_subtasks() {
   # Prefer the first unchecked subtask under an unchecked parent task.
   # Output format: "<line_no>:<full line>"
   awk '
-    function is_unchecked(line) { return line ~ /^[[:space:]]*-\s*\[\s\]\s+/ }
-    function is_subtask(line) { return line ~ /^[[:space:]]+-\s*\[\s\]\s+Task [0-9]+\.[0-9]+/ }
-    function is_parent(line) { return line ~ /^[[:space:]]*-\s*\[\s\]\s+Task [0-9]+:/ }
+    function is_unchecked(line) { return line ~ /^[[:space:]]*-[[:space:]]*\[[[:space:]]\][[:space:]]+/ }
+    function is_subtask(line) { return line ~ /^[[:space:]]+-[[:space:]]*\[[[:space:]]\][[:space:]]+Task [0-9]+(\.[0-9]+)+/ }
+    function is_parent(line) { return line ~ /^[[:space:]]*-[[:space:]]*\[[[:space:]]\][[:space:]]+Task [0-9]+:/ }
     {
       if (is_unchecked($0)) {
         if (is_parent($0)) {
@@ -155,7 +155,7 @@ next_todo_with_subtasks() {
         exit
       }
 
-      if (in_parent && $0 ~ /^[[:space:]]*-\s*\[[xX]\]/) {
+      if (in_parent && $0 ~ /^[[:space:]]*-[[:space:]]*\[[xX]\]/) {
         next
       }
 
