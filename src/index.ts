@@ -47,6 +47,9 @@ async function loadOptionalRouter(relPath: string) {
   const prTracking = await loadOptionalRouter('routes/api/prTracking')
   if (prTracking) app.use('/api/pr-tracking', prTracking)
 
+  const activeJob = await loadOptionalRouter('routes/api/activeJob')
+  if (activeJob) app.use('/api/active-job', activeJob)
+
   app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`Server listening on port ${port}`)
