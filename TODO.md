@@ -22,9 +22,12 @@ Following docs/todo.md - topmost unchecked tasks. OpenClaw will work from the to
   - [x] Task 1.6.1: DB migration & seed — create featured_repos table and seed initial entries for wjbetech and wjbetech-claw.
   - [x] Task 1.6.2: Octokit service & caching — improve Octokit wrapper with rate-limit awareness and in-memory caching.
   - [ ] Task 1.6.3: API endpoints — implement /api/github/featured, /api/github/repos/:owner/:repo/activities, /api/github/orgs/:org/prs.
-  - [ ] Task 1.6.4: Service tests — unit tests mocking Octokit responses and verifying aggregation logic.
+  - [x] Task 1.6.4: Service tests — unit tests mocking Octokit responses and verifying aggregation logic.
   - [ ] Task 1.6.5: Integration tests & CI — add integration tests for endpoints using msw/nock and enable CI steps to run them.
   - [ ] Task 1.6.6: Frontend wiring — connect Repos page to the new endpoints, fetch activities and PRs, display dates and links.
+
+  2026-03-04T12:31:00Z | chore/agent-2026-03-04-implement-1.6.4-tests | committed+pushed | Added unit tests for API routes and opened PR #229
+
 
   High-level plan:
   - Implement 1.6.1 first (DB migration + seed) so the backend has a persisted source of featured repos.
