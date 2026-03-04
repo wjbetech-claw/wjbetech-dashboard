@@ -4,7 +4,7 @@ import Overview from '../overview'
 
 beforeEach(()=>{
   // @ts-ignore
-  global.fetch = jest.fn((url)=>{
+  global.fetch = vi.fn((url)=>{
     if(url.includes('/api/featured')){
       return Promise.resolve({ ok:true, json: ()=>Promise.resolve([{ id:1, owner:'wjbetech', repo:'wjbetech-dashboard', full_name:'wjbetech/wjbetech-dashboard', url:'https://github.com/wjbetech/wjbetech-dashboard' }]) })
     }
@@ -17,7 +17,7 @@ beforeEach(()=>{
 
 afterEach(()=>{
   // @ts-ignore
-  global.fetch.mockRestore()
+  delete global.fetch
 })
 
 test('renders overview with featured repos and active job', async ()=>{
