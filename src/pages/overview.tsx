@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import { Card } from '../ui/card'
+import Card from '../ui/card'
 import { Button } from '../ui/button'
 
 export default function Overview(){
