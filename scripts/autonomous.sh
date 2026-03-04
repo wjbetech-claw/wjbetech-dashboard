@@ -417,6 +417,9 @@ main() {
 
     item="$(next_todo_with_subtasks)"
     if [[ -z "$item" ]]; then
+      item="$(next_todo)"
+    fi
+    if [[ -z "$item" ]]; then
       notify "All TODOs complete."
       exit 0
     fi
