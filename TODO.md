@@ -85,6 +85,11 @@ Following docs/todo.md - topmost unchecked tasks. OpenClaw will work from the to
   2026-03-05T06:17:00Z | feat/agent-2026-03-05-task-3.1.4 | merged | Added integration tests for jobs ordering and featured repos (PR #238)
 
 - [ ] Task 3.2: Accessibility Audit & Fixes - axe-core 0 violations
+
+  Subtasks:
+  - [x] Task 3.2.1: Basic axe checks - add automated axe check for Overview page (3.2.1).
+  - [ ] Task 3.2.2: Axe checks for Repos & Jobs pages - add automated checks for Repos and Jobs pages.
+  - [ ] Task 3.2.3: Triage & fix violations - fix any violations found and add focused accessibility updates.
 - [ ] Task 3.3: Performance & Optimization - Lighthouse >90
 
 ## Phase 4: Polish & Deployment
