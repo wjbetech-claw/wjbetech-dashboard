@@ -80,7 +80,9 @@ Following docs/todo.md - topmost unchecked tasks. OpenClaw will work from the to
   - [x] Task 3.1.3: Frontend tests - add Vitest/jsdom tests for Jobs Kanban (create, move, rollback).
 
     2026-03-03T05:xx:00Z | feat/tests-frontend-jobs | committed | Added frontend Kanban smoke and focused tests (PRs #208, #212).
-  - [ ] Task 3.1.4: Integration tests - add supertest tests for /api/jobs ordering persistence and /api/github endpoints.
+  - [x] Task 3.1.4: Integration tests - add supertest tests for /api/jobs ordering persistence and /api/github endpoints.
+
+  2026-03-05T06:17:00Z | feat/agent-2026-03-05-task-3.1.4 | merged | Added integration tests for jobs ordering and featured repos (PR #238)
 
 - [ ] Task 3.2: Accessibility Audit & Fixes - axe-core 0 violations
 - [ ] Task 3.3: Performance & Optimization - Lighthouse >90
