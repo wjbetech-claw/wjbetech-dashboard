@@ -74,7 +74,9 @@ Following docs/todo.md - topmost unchecked tasks. OpenClaw will work from the to
   - [x] Task 3.1.1: Coverage triage - run coverage, identify top missing modules, and create a test plan.
 
     2026-03-02T13:26:00Z | chore/coverage-triage | attempted | Ran local test runner; encountered environment dependency errors (msw devDependency and vitest coverage plugin). Next: fix devDependencies (@vitest/coverage-v8 or adjust vitest config) so coverage can run in CI/workspace.
-  - [ ] Task 3.1.2: Backend tests - add unit tests for githubService and activeJob (mock Octokit + DB).
+  - [x] Task 3.1.2: Backend tests - add unit tests for githubService and activeJob (mock Octokit + DB).
+
+  2026-03-05T03:09:00Z | feat/agent-2026-03-05-task-3.1.2 | merged | Added backend unit tests for activeJob and GitHubService (PR #236)
   - [x] Task 3.1.3: Frontend tests - add Vitest/jsdom tests for Jobs Kanban (create, move, rollback).
 
     2026-03-03T05:xx:00Z | feat/tests-frontend-jobs | committed | Added frontend Kanban smoke and focused tests (PRs #208, #212).
