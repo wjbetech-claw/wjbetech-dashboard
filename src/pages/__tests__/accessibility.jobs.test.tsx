@@ -1,7 +1,6 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import { axe, toHaveNoViolations } from 'jest-axe'
-import JobsPage from '../jobs'
 
 expect.extend(toHaveNoViolations)
 
@@ -18,6 +17,8 @@ global.fetch = vi.fn((url)=>{
 vi.mock('@dnd-kit/core', ()=>({
   DndContext: ({children}: any)=> React.createElement('div', null, children)
 }))
+
+import JobsPage from '../jobs'
 
 test('Jobs page should have no basic accessibility violations', async ()=>{
   const { container } = render(<JobsPage />)
