@@ -89,9 +89,10 @@ Following docs/todo.md - topmost unchecked tasks. OpenClaw will work from the to
   Subtasks:
   - [x] Task 3.2.1: Basic axe checks - add automated axe check for Overview page (3.2.1).
   - [x] Task 3.2.2: Axe checks for Repos & Jobs pages - add automated checks for Repos and Jobs pages.
-  - [ ] Task 3.2.3: Triage & fix violations - fix any violations found and add focused accessibility updates.
+  - [x] Task 3.2.3: Triage & fix violations - fix any violations found and add focused accessibility updates.
 
   2026-03-05T14:24:00Z | feat/agent-2026-03-05-task-3.2.2 | merged | Added axe checks for Repos and Jobs pages (PR #242)
+  2026-03-06T05:26:00Z | feat/agent-2026-03-06-task-3.2.3 | committed+pushed | Ran axe sweeps, fixed heading-order and navbar test; opened PR #244
 - [ ] Task 3.3: Performance & Optimization - Lighthouse >90
 
 ## Phase 4: Polish & Deployment
