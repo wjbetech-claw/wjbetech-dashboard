@@ -1,0 +1,27 @@
+name: "Perf Audit (Lighthouse)"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start dev server
+        run: |
+          npm ci --prefer-offline --no-audit --progress=false || true
+          npm run build || true
+          npm install -g serve
+          serve -s dist -l 5000 &
+          sleep 2
+      - name: Run LHCI autorun
+        run: npx -y @lhci/cli autorun --upload.target=temporary-public-storage --url=http://localhost:5000
+      - name: Upload LHCI report (if produced)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhci-results
+          path: .lighthouseci
