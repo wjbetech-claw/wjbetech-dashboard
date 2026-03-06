@@ -1,0 +1,32 @@
+name: "Perf Audit (Lighthouse)"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start dev server
+        run: |
+          set -e
+          npm ci --prefer-offline --no-audit --progress=false
+          # Build frontend (vite) into dist
+          npx -y vite build --outDir dist
+          # Also run backend build if present
+          npm run build || true
+          ls -la dist || (echo "dist directory missing after build — aborting" && exit 1)
+          npm install -g serve
+          serve -s dist -l 5000 &
+          sleep 2
+      - name: Run LHCI autorun
+        run: npx -y @lhci/cli autorun --collect.staticDistDir=dist --collect.url=http://localhost:5000 --upload.target=temporary-public-storage
+      - name: Upload LHCI report (if produced)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhci-results
+          path: .lighthouseci
