@@ -9,7 +9,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "echo 'eslint not configured - skip'",
-    "test": "echo \"No tests configured\" && exit 0"
+    "test": "echo \"No tests configured\" && exit 0",
+    "optimize:images": "node scripts/optimize-images.js"
   },
   "engines": {
     "node": ">=18"
