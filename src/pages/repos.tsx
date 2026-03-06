@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card } from '../ui/card'
 import { Button } from '../ui/button'
 
+// Lazy-load RepoMeta to reduce initial bundle size for Repos page
 const RepoMeta = lazy(() => import('../components/RepoMeta'))
 
 type Repo = { id:number; name:string; full_name:string; url?:string }
