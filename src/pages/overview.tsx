@@ -25,7 +25,7 @@ export default function Overview(){
       <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:12}}>
         <div>
           <Card>
-            <h3>Featured Repositories <small style={{fontSize:12,color:'var(--muted)',marginLeft:8}}>{featured.length} shown</small></h3>
+            <h2>Featured Repositories <small style={{fontSize:12,color:'var(--muted)',marginLeft:8}}>{featured.length} shown</small></h2>
             {featured.map(r=> (
               <div key={r.id} style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
                 <a href={r.url} target="_blank" rel="noreferrer">{r.full_name}</a>
@@ -39,7 +39,7 @@ export default function Overview(){
         </div>
         <div>
           <Card>
-            <h3>Active Job</h3>
+            <h2>Active Job</h2>
             {activeJob ? (
               <div>
                 <div style={{fontWeight:700}}>{activeJob.title || activeJob.repo_full_name}</div>
