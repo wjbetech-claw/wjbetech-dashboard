@@ -28,12 +28,12 @@ export default function SettingsPage(){
       </div>
 
       <div style={{marginTop:12}}>
-        <h3>Integrations</h3>
+        <h2>Integrations</h2>
         <p>Connect GitHub, Slack, and other services here.</p>
       </div>
 
       <div style={{marginTop:12}}>
-        <h3>Notifications</h3>
+        <h2>Notifications</h2>
         <p>Set preferences for email and in-app notifications.</p>
       </div>
     </div>
