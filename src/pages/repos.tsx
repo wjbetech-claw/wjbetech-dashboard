@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, Suspense, lazy} from 'react'
 import { Link } from 'react-router-dom'
 import { Card } from '../ui/card'
 import { Button } from '../ui/button'
+
+const RepoMeta = lazy(() => import('../components/RepoMeta'))
 
 type Repo = { id:number; name:string; full_name:string; url?:string }
 
@@ -42,7 +44,9 @@ export default function ReposPage(){
             </div>
             <div style={{marginTop:8,fontSize:13,color:'var(--muted)'}}>
               <small>
-                <RepoMeta owner={r.full_name.split('/')[0]} repo={r.name} />
+                <Suspense fallback={<span>Loading...</span>}>
+                  <RepoMeta owner={r.full_name.split('/')[0]} repo={r.name} />
+                </Suspense>
               </small>
             </div>
           </Card>
