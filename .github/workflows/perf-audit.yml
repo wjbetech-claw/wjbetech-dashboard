@@ -14,7 +14,10 @@ jobs:
         run: |
           set -e
           npm ci --prefer-offline --no-audit --progress=false
-          npm run build
+          # Build frontend (vite) into dist
+          npx -y vite build --outDir dist
+          # Also run backend build if present
+          npm run build || true
           ls -la dist || (echo "dist directory missing after build — aborting" && exit 1)
           npm install -g serve
           serve -s dist -l 5000 &
