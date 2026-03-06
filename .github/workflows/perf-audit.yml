@@ -12,8 +12,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Start dev server
         run: |
-          npm ci --prefer-offline --no-audit --progress=false || true
-          npm run build || true
+          set -e
+          npm ci --prefer-offline --no-audit --progress=false
+          npm run build
+          ls -la dist || (echo "dist directory missing after build — aborting" && exit 1)
           npm install -g serve
           serve -s dist -l 5000 &
           sleep 2
