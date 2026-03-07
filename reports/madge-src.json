@@ -1,0 +1,11 @@
+{
+  "App.js": [],
+  "index.js": [],
+  "main.js": [
+    "App.js",
+    "styles/tokens.css",
+    "styles/tokens.generated.css"
+  ],
+  "styles/tokens.css": [],
+  "styles/tokens.generated.css": []
+}
