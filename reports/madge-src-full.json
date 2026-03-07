@@ -1,0 +1,288 @@
+{
+  "App.tsx": [
+    "components/ErrorBoundary.tsx",
+    "components/OfflineBanner.tsx",
+    "hooks/useOnlineStatus.ts",
+    "pages/BoardPage.tsx",
+    "pages/DashboardPage.tsx",
+    "pages/JobsPage.tsx",
+    "pages/ReposPage.tsx",
+    "pages/SettingsPage.tsx",
+    "ui/page-layout.tsx"
+  ],
+  "app/App.tsx": [],
+  "components/ActiveJob.tsx": [],
+  "components/AlertsPanel.tsx": [
+    "ui/card.tsx"
+  ],
+  "components/EmptyState.tsx": [],
+  "components/EnvironmentsGrid.tsx": [
+    "ui/card.tsx"
+  ],
+  "components/ErrorBoundary.tsx": [],
+  "components/JobListing.tsx": [],
+  "components/Navbar.tsx": [
+    "components/ThemeSwitcher.tsx"
+  ],
+  "components/OfflineBanner.tsx": [],
+  "components/OverviewStats.tsx": [
+    "ui/card.tsx"
+  ],
+  "components/PipelineOverview.tsx": [
+    "ui/card.tsx"
+  ],
+  "components/RecentActivity.tsx": [
+    "ui/card.tsx"
+  ],
+  "components/RecentCommits.tsx": [],
+  "components/RepoMeta.tsx": [],
+  "components/Repositories.tsx": [],
+  "components/SkipLink.tsx": [],
+  "components/ThemeSwitcher.tsx": [],
+  "components/__tests__/AlertsPanel.test.tsx": [
+    "components/AlertsPanel.tsx"
+  ],
+  "components/__tests__/EnvironmentsGrid.test.tsx": [
+    "components/EnvironmentsGrid.tsx"
+  ],
+  "components/__tests__/JobListing.test.tsx": [
+    "components/JobListing.tsx"
+  ],
+  "components/__tests__/Kanban.test.tsx": [
+    "components/kanban/Kanban.tsx"
+  ],
+  "components/__tests__/OverviewStats.test.tsx": [
+    "components/OverviewStats.tsx"
+  ],
+  "components/__tests__/PipelineOverview.test.tsx": [
+    "components/PipelineOverview.tsx"
+  ],
+  "components/__tests__/RecentActivity.test.tsx": [
+    "components/RecentActivity.tsx"
+  ],
+  "components/__tests__/Repositories.test.tsx": [
+    "components/Repositories.tsx"
+  ],
+  "components/kanban/Kanban.tsx": [],
+  "components/kanban/__tests__/Kanban.test.tsx": [
+    "components/kanban/Kanban.tsx"
+  ],
+  "contracts/activeJob.ts": [
+    "contracts/shared.ts"
+  ],
+  "contracts/index.ts": [
+    "contracts/activeJob.ts",
+    "contracts/job.ts",
+    "contracts/pr.ts",
+    "contracts/repo.ts",
+    "contracts/shared.ts",
+    "contracts/workflow.ts"
+  ],
+  "contracts/job.ts": [
+    "contracts/shared.ts"
+  ],
+  "contracts/pr.ts": [
+    "contracts/shared.ts"
+  ],
+  "contracts/repo.ts": [
+    "contracts/shared.ts"
+  ],
+  "contracts/shared.ts": [],
+  "contracts/workflow.ts": [
+    "contracts/shared.ts"
+  ],
+  "dao/userDao.ts": [
+    "db/index.ts"
+  ],
+  "db/index.ts": [],
+  "hooks/useOnlineStatus.ts": [],
+  "index.ts": [],
+  "lib/utils.ts": [],
+  "main.tsx": [
+    "App.tsx",
+    "styles/theme.css",
+    "styles/tokens.css",
+    "styles/tokens.generated.css"
+  ],
+  "pages/BoardPage.tsx": [
+    "components/kanban/Kanban.tsx",
+    "ui/card.tsx"
+  ],
+  "pages/Dashboard.tsx": [
+    "ui/button.tsx"
+  ],
+  "pages/DashboardPage.tsx": [
+    "pages/MainDashboard.tsx",
+    "ui/Toasts.tsx"
+  ],
+  "pages/JobsPage.tsx": [
+    "services/api.ts",
+    "ui/badge.tsx",
+    "ui/card.tsx",
+    "ui/empty-state.tsx"
+  ],
+  "pages/MainDashboard.tsx": [
+    "components/AlertsPanel.tsx",
+    "components/EnvironmentsGrid.tsx",
+    "components/OverviewStats.tsx",
+    "components/PipelineOverview.tsx",
+    "components/RecentActivity.tsx",
+    "services/api.ts",
+    "styles/dashboard.css",
+    "ui/card.tsx",
+    "ui/empty-state.tsx",
+    "ui/error-banner.tsx",
+    "ui/skeleton.tsx"
+  ],
+  "pages/OverviewPage.tsx": [
+    "pages/MainDashboard.tsx"
+  ],
+  "pages/ReposPage.tsx": [
+    "services/api.ts",
+    "ui/badge.tsx",
+    "ui/card.tsx",
+    "ui/empty-state.tsx",
+    "ui/table.tsx"
+  ],
+  "pages/SettingsPage.tsx": [
+    "ui/badge.tsx",
+    "ui/card.tsx"
+  ],
+  "pages/__tests__/a11y.pages.test.tsx": [
+    "pages/JobsPage.tsx",
+    "pages/ReposPage.tsx",
+    "pages/SettingsPage.tsx"
+  ],
+  "pages/__tests__/a11y.smoke.test.tsx": [
+    "pages/MainDashboard.tsx"
+  ],
+  "pages/__tests__/accessibility.jobs.test.tsx": [],
+  "pages/__tests__/accessibility.overview.test.tsx": [
+    "pages/overview.tsx"
+  ],
+  "pages/__tests__/accessibility.repos.test.tsx": [
+    "pages/repos.tsx"
+  ],
+  "pages/__tests__/accessibility.settings.test.tsx": [
+    "pages/settings.tsx"
+  ],
+  "pages/__tests__/dashboard.test.tsx": [
+    "pages/MainDashboard.tsx"
+  ],
+  "pages/__tests__/jobs.test.tsx": [
+    "pages/JobsPage.tsx"
+  ],
+  "pages/__tests__/overview.test.tsx": [
+    "pages/overview.tsx"
+  ],
+  "pages/__tests__/repos.test.tsx": [
+    "pages/ReposPage.tsx"
+  ],
+  "pages/__tests__/settings.test.tsx": [
+    "pages/SettingsPage.tsx"
+  ],
+  "pages/jobs.tsx": [
+    "ui/button.tsx",
+    "ui/card.tsx",
+    "ui/toast.tsx"
+  ],
+  "pages/overview.tsx": [
+    "ui/button.tsx",
+    "ui/card.tsx"
+  ],
+  "pages/repos.tsx": [
+    "components/RepoMeta.tsx",
+    "ui/button.tsx",
+    "ui/card.tsx"
+  ],
+  "pages/settings.tsx": [
+    "ui/switch.tsx"
+  ],
+  "routes/api/activeJob.ts": [
+    "db/index.ts"
+  ],
+  "routes/api/featuredRepos.ts": [
+    "db/index.ts"
+  ],
+  "routes/api/prTracking.ts": [
+    "services/octokitService.ts"
+  ],
+  "routes/api/repoActivities.ts": [
+    "services/octokitService.ts"
+  ],
+  "services/api.ts": [],
+  "services/githubRepoService.ts": [],
+  "services/githubService.ts": [],
+  "services/octokitService.ts": [],
+  "styles/dashboard.css": [],
+  "styles/theme.css": [],
+  "styles/tokens.css": [],
+  "styles/tokens.generated.css": [],
+  "types/css-modules.d.ts": [],
+  "ui/Toasts.tsx": [],
+  "ui/__tests__/accessibility.navbar.test.tsx": [
+    "ui/navbar.tsx"
+  ],
+  "ui/__tests__/badge.test.tsx": [
+    "ui/badge.tsx"
+  ],
+  "ui/__tests__/button.test.tsx": [
+    "ui/button.tsx"
+  ],
+  "ui/__tests__/card.test.tsx": [
+    "ui/card.tsx"
+  ],
+  "ui/__tests__/empty-state.test.tsx": [
+    "ui/empty-state.tsx"
+  ],
+  "ui/__tests__/error-banner.test.tsx": [
+    "ui/error-banner.tsx"
+  ],
+  "ui/__tests__/input.test.tsx": [
+    "ui/input.tsx"
+  ],
+  "ui/__tests__/modal.test.tsx": [
+    "ui/modal.tsx"
+  ],
+  "ui/__tests__/select.test.tsx": [
+    "ui/select.tsx"
+  ],
+  "ui/__tests__/table.test.tsx": [
+    "ui/table.tsx"
+  ],
+  "ui/badge.tsx": [
+    "lib/utils.ts"
+  ],
+  "ui/button.tsx": [
+    "lib/utils.ts"
+  ],
+  "ui/card.tsx": [],
+  "ui/empty-state.tsx": [],
+  "ui/error-banner.tsx": [],
+  "ui/input.tsx": [
+    "lib/utils.ts"
+  ],
+  "ui/modal.tsx": [],
+  "ui/navbar.tsx": [
+    "ui/button.tsx",
+    "ui/theme-switcher.tsx"
+  ],
+  "ui/page-layout.tsx": [
+    "components/SkipLink.tsx",
+    "ui/navbar.tsx",
+    "ui/sidebar.tsx"
+  ],
+  "ui/select.tsx": [
+    "lib/utils.ts"
+  ],
+  "ui/sidebar.tsx": [],
+  "ui/skeleton.tsx": [],
+  "ui/switch.tsx": [
+    "ui/theme-switcher.tsx"
+  ],
+  "ui/table.tsx": [
+    "lib/utils.ts"
+  ],
+  "ui/theme-switcher.tsx": [],
+  "ui/toast.tsx": []
+}
