@@ -78,3 +78,13 @@
 .skeleton::after{content:"";position:absolute;inset:0;background-image:var(--skeleton-gradient);transform:translateX(-100%);animation:shimmer 1.2s var(--motion-easing-standard) infinite}
 
 @keyframes shimmer{100%{transform:translateX(100%)}}
+
+
+/* Ensure theme dropdown doesn't scroll horizontally */
+.dropdown-content {
+  overflow-x: hidden;
+}
+.dropdown-content .menu li button {
+  white-space: normal;
+  word-break: break-word;
+}
