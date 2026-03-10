@@ -1,0 +1,7 @@
+[
+  "/workspace/backend/src/routes/activeJob.ts",
+  "/workspace/backend/src/routes/health.ts",
+  "/workspace/backend/src/routes/overview.ts",
+  "/workspace/backend/src/workers/syncWorker.github.ts",
+  "/workspace/backend/src/workers/syncWorker.ts"
+]
