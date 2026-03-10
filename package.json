@@ -36,7 +36,8 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
     "supertest": "6.3.3",
-    "concurrently": "7.6.0"
+    "concurrently": "7.6.0",
+    "ts-morph": "18.0.0"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
