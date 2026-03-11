@@ -1,36 +1,7 @@
-import express from 'express'
-import githubService from '../services/githubService'
-
-const router = express.Router()
-
-router.get('/featured', async (req, res)=>{
-  try{
-    const data = await githubService.getFeaturedRepos()
-    res.json({ repos: data })
-  }catch(e){
-    res.status(500).json({ error: 'failed' })
-  }
-})
-
-router.get('/orgs/:org/prs', async (req,res)=>{
-  const { org } = req.params
-  const limit = parseInt((req.query.limit as string) || '5',10)
-  try{
-    const data = await githubService.getOrgPRs(org, limit)
-    res.json({ prs: data })
-  }catch(e){
-    res.status(500).json({ error: 'failed' })
-  }
-})
-
-router.get('/repos/:owner/:repo/activities', async (req,res)=>{
-  const { owner, repo } = req.params
-  try{
-    const data = await githubService.getRepoActivities(owner, repo)
-    res.json(data)
-  }catch(e){
-    res.status(500).json({ error: 'failed' })
-  }
-})
-
+// Placeholder: implement GitHub endpoints (/api/github/featured, /api/github/repos/:owner/:repo/activities, /api/github/orgs/:org/prs)
+import { Router } from 'express'
+const router = Router()
+router.get('/featured', (req, res) => res.json({ featured: [] }))
+router.get('/repos/:owner/:repo/activities', (req, res) => res.json({ activities: [] }))
+router.get('/orgs/:org/prs', (req, res) => res.json({ prs: [] }))
 export default router
